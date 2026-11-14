@@ -106,7 +106,7 @@
                 <div id="listaCategorias" class="flex flex-wrap gap-2 mt-4"></div>
             </div>
 
-            <!-- Sub-bloque B: Ingreso de Vehículo, Galería R2 y Generador de SKU -->
+            <!-- Sub-bloque B: Ingreso de Vehículo, Galería R2 (4 Fotos + 1 Video) y Generador de SKU -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <h3 class="text-lg font-black mb-1">Ingreso de Vehículo y Variantes SKU</h3>
                 <p class="text-xs text-gray-500 mb-4">Los vehículos marcados como <b>Destacados</b> aparecen primero en la vitrina principal.</p>
@@ -154,12 +154,24 @@
                         <input type="text" id="vehSkuGenerado" readonly class="w-full bg-red-50 border border-red-300 text-red-700 font-mono font-bold rounded-lg px-3 py-2 text-sm">
                     </div>
 
-                    <!-- GALERÍA MULTIMEDIA R2 -->
-                    <div class="md:col-span-2">
-                        <label class="text-xs font-bold text-gray-600 block mb-1">GALERÍA FOTOS/VIDEOS (SUBIR A R2)</label>
-                        <input type="file" id="vehGaleriaFiles" multiple accept="image/*,video/*" onchange="subirGaleriaR2(this)" class="w-full text-xs bg-white border border-gray-300 rounded-lg p-1.5">
+                    <!-- GALERÍA MULTIMEDIA R2 (4 FOTOS + 1 VIDEO) -->
+                    <div class="md:col-span-2 bg-white p-4 rounded-xl border border-gray-200">
+                        <label class="text-xs font-bold text-gray-700 block mb-1">GALERÍA DEL VEHÍCULO (4 FOTOS + 1 VIDEO)</label>
+                        <p class="text-[11px] text-gray-400 mb-2">Sube 4 imágenes y 1 video MP4 para completar exactamente las 5 miniaturas del modal.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[11px] font-bold text-gray-600 block mb-1">4 FOTOS (GRÁFICOS)</label>
+                                <input type="file" id="vehFotosFiles" multiple accept="image/*" onchange="subirGaleriaFotosR2(this)" class="w-full text-xs bg-gray-50 border border-gray-300 rounded-lg p-1.5">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-gray-600 block mb-1">1 VIDEO PROMOCIONAL (MP4)</label>
+                                <input type="file" id="vehVideoFile" accept="video/mp4,video/webm" onchange="subirVideoR2(this)" class="w-full text-xs bg-gray-50 border border-gray-300 rounded-lg p-1.5">
+                            </div>
+                        </div>
+
                         <input type="hidden" id="vehGaleriaUrls" value="[]">
-                        <span id="galeriaStatus" class="text-xs text-green-600 font-semibold"></span>
+                        <div id="galeriaStatus" class="text-xs font-bold text-green-600 mt-2"></div>
                     </div>
 
                     <div class="md:col-span-4 text-right">

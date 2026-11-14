@@ -32,20 +32,57 @@ async function subirArchivoR2(inputFile, targetInputId) {
     }
 }
 
-async function subirGaleriaR2(inputFiles) {
+// --- GESTIÓN GALERÍA VEHÍCULO (4 FOTOS + 1 VIDEO) ---
+let urlsFotosTemp = [];
+let urlVideoTemp = "";
+
+async function subirGaleriaFotosR2(inputFiles) {
     if (!inputFiles.files.length) return;
-    const urls = [];
-    document.getElementById('galeriaStatus').innerText = 'Subiendo archivos...';
+    if (inputFiles.files.length > 4) {
+        alert("Por favor selecciona máximo 4 fotos (gráficos).");
+        return;
+    }
+    
+    urlsFotosTemp = [];
+    document.getElementById('galeriaStatus').innerText = 'Subiendo fotos a R2...';
 
     for (const file of inputFiles.files) {
         const formData = new FormData();
         formData.append('file', file);
         const res = await fetch('/api/media/upload', { method: 'POST', body: formData });
         const data = await res.json();
-        if (data.url) urls.push(data.url);
+        if (data.url) urlsFotosTemp.push(data.url);
     }
-    document.getElementById('vehGaleriaUrls').value = JSON.stringify(urls);
-    document.getElementById('galeriaStatus').innerText = `✅ ${urls.length} archivos listos en R2`;
+    actualizarGaleriaFinal();
+}
+
+async function subirVideoR2(inputFile) {
+    if (!inputFile.files.length) return;
+    const file = inputFile.files[0];
+    
+    document.getElementById('galeriaStatus').innerText = 'Subiendo video a R2...';
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const res = await fetch('/api/media/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.url) {
+            urlVideoTemp = data.url;
+        }
+    } catch (err) {
+        alert('Error subiendo video a R2');
+    }
+    actualizarGaleriaFinal();
+}
+
+function actualizarGaleriaFinal() {
+    const galeriaCompleta = [...urlsFotosTemp];
+    if (urlVideoTemp) {
+        galeriaCompleta.push(urlVideoTemp);
+    }
+    document.getElementById('vehGaleriaUrls').value = JSON.stringify(galeriaCompleta);
+    document.getElementById('galeriaStatus').innerText = `✅ Galería lista: ${urlsFotosTemp.length} foto(s) y ${urlVideoTemp ? '1 video' : '0 videos'} subidos.`;
 }
 
 // --- SECCIÓN 1: SLIDER ---

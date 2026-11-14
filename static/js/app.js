@@ -13,35 +13,47 @@ async function inicializarTienda() {
         const res = await fetch('/api/tienda/inicio');
         const data = await res.json();
 
-        // 1. Cargar categorías en el selector de filtros
+        // 1. Cargar categorías en el selector de filtros (iniciando con la primera registrada)
         const selectCat = document.getElementById('filtroTipo');
         if (selectCat && data.categorias && data.categorias.length > 0) {
-            selectCat.innerHTML = `<option value="ALL">Todas las Categorías</option>`;
+            selectCat.innerHTML = '';
             data.categorias.forEach(c => {
                 selectCat.innerHTML += `<option value="${c.codigo}">${c.nombre}</option>`;
             });
         }
 
-        // 2. Renderizar Slider (Sección 1)
+        // 2. Cargar marcas dinámicamente desde los destacados (iniciando con la primera registrada)
+        const selectMarca = document.getElementById('filtroMarca');
+        if (selectMarca && data.destacados && data.destacados.length > 0) {
+            const marcasUnicas = [...new Map(data.destacados.map(v => [v.marca_cod, v.marca])).entries()];
+            selectMarca.innerHTML = '';
+            marcasUnicas.forEach(([cod, nombre]) => {
+                selectMarca.innerHTML += `<option value="${cod}">${nombre}</option>`;
+            });
+        }
+
+        // 3. Renderizar Slider (Sección 1)
         if (data.slider && data.slider.length > 0) {
             slidesData = data.slider;
             iniciarSlider();
         }
 
-        // 3. Renderizar Vehículos Destacados por defecto (Sección 2)
+        // 4. Renderizar Vehículos Destacados por defecto (Sección 2)
         vehiculosActuales = data.destacados || [];
         renderizarVehiculos(vehiculosActuales, true);
 
-        // 4. Renderizar Historias de Autos Vendidos (Sección 3)
+        // 5. Renderizar Historias de Autos Vendidos (Sección 3)
         renderizarHistorias(data.historias || []);
 
-        // 5. Renderizar 3 Espacios Publicitarios (Sección 4)
+        // 6. Renderizar 3 Espacios Publicitarios (Sección 4)
         renderizarPublicidad(data.publicidad || []);
 
-        // 6. Renderizar Pie de Página (Sección 5)
+        // 7. Renderizar Pie de Página (Sección 5)
         if (data.footer) {
             renderizarFooter(data.footer);
         }
+
+        actualizarSKUPreview();
     } catch (error) {
         console.error("Error cargando datos de la tienda:", error);
     }
@@ -98,8 +110,8 @@ async function aplicarFiltrosTienda() {
     actualizarSKUPreview();
 
     const params = new URLSearchParams({
-        categoria_cod: document.getElementById('filtroTipo')?.value || 'ALL',
-        marca_cod: document.getElementById('filtroMarca')?.value || 'ALL',
+        categoria_cod: document.getElementById('filtroTipo')?.value || '',
+        marca_cod: document.getElementById('filtroMarca')?.value || '',
         es_4x4: document.getElementById('filtro4x4')?.checked || false,
         es_hibrido: document.getElementById('filtroHibrido')?.checked || false,
         es_blindado: document.getElementById('filtroBlindado')?.checked || false
@@ -118,8 +130,12 @@ async function aplicarFiltrosTienda() {
 }
 
 async function resetearFiltros() {
-    if (document.getElementById('filtroTipo')) document.getElementById('filtroTipo').value = 'ALL';
-    if (document.getElementById('filtroMarca')) document.getElementById('filtroMarca').value = 'ALL';
+    const selectCat = document.getElementById('filtroTipo');
+    if (selectCat && selectCat.options.length > 0) selectCat.selectedIndex = 0;
+
+    const selectMarca = document.getElementById('filtroMarca');
+    if (selectMarca && selectMarca.options.length > 0) selectMarca.selectedIndex = 0;
+
     if (document.getElementById('filtroAnio')) document.getElementById('filtroAnio').value = '';
     if (document.getElementById('filtro4x4')) document.getElementById('filtro4x4').checked = false;
     if (document.getElementById('filtroHibrido')) document.getElementById('filtroHibrido').checked = false;
@@ -359,6 +375,5 @@ function abrirCarrito() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    actualizarSKUPreview();
     inicializarTienda();
 });
