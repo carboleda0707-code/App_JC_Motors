@@ -29,6 +29,10 @@ class Settings:
     # Base de datos (Railway provee DATABASE_URL automáticamente)
     DATABASE_URL: str = get_setting("database", "url", "DATABASE_URL")
     
+    # Seguridad y JWT (Requerido por core/security.py)
+    SECRET_KEY: str = get_setting("security", "secret_key", "SECRET_KEY", "super-secret-key-default")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(get_setting("security", "access_token_expire_minutes", "ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+
     # Cloudflare R2
     R2_ENDPOINT_URL: str = get_setting("r2", "endpoint_url", "R2_ENDPOINT_URL")
     R2_ACCESS_KEY_ID: str = get_setting("r2", "access_key_id", "R2_ACCESS_KEY_ID")
