@@ -6,7 +6,6 @@
     <title>JC Motors | Patio de Vehículos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Hoja de estilos modular externa -->
     <link rel="stylesheet" href="/static/css/diseno.css">
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans antialiased">
@@ -14,16 +13,16 @@
     <!-- CABECERA Y MENÚ PRINCIPAL FIJO -->
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur shadow-sm border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-2">
+            <a href="#inicio" class="flex items-center gap-2">
                 <span class="bg-red-600 text-white font-black p-2 rounded-lg text-lg tracking-wider">JC</span>
                 <span class="text-2xl font-black text-gray-900 tracking-tight">MOTORS</span>
-            </div>
+            </a>
             
             <nav class="hidden md:flex space-x-8 font-semibold text-sm text-gray-700">
                 <a href="#inicio" class="hover:text-red-600 transition">Inicio</a>
                 <a href="#categorias" class="hover:text-red-600 transition">Inventario</a>
-                <a href="#nuevos" class="hover:text-red-600 transition">Nuevos</a>
-                <a href="#financiamiento" class="hover:text-red-600 transition">Planes de Financiamiento</a>
+                <a href="#historias" class="hover:text-red-600 transition">Entregas</a>
+                <a href="#financiamiento" class="hover:text-red-600 transition">Promociones</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -33,109 +32,99 @@
             </div>
         </div>
 
-        <!-- SUBMENÚ DE CATEGORÍAS Y FILTROS FIJO CON AÑO -->
+        <!-- SUBMENÚ DE CATEGORÍAS Y FILTROS FIJO -->
         <div class="bg-gray-900 text-white py-2.5 px-4 shadow-inner">
-            <div class="max-w-7xl mx-auto flex flex-wrap gap-4 items-center justify-between text-xs md:text-sm">
-                <div class="flex flex-wrap gap-3 items-center">
-                    <select id="filtroTipo" onchange="actualizarSKUDinamico()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
-                        <option value="SUV">SUV</option>
-                        <option value="SED">Sedán</option>
-                        <option value="PUK">Pickup / Camioneta</option>
+            <div class="max-w-7xl mx-auto flex flex-wrap gap-3 items-center justify-between text-xs md:text-sm">
+                <div class="flex flex-wrap gap-2.5 items-center">
+                    <select id="filtroTipo" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
+                        <option value="ALL">Todas las Categorías</option>
                     </select>
 
-                    <select id="filtroMarca" onchange="actualizarSKUDinamico()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
+                    <select id="filtroMarca" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
+                        <option value="ALL">Todas las Marcas</option>
                         <option value="TOY">Toyota</option>
                         <option value="CHE">Chevrolet</option>
                         <option value="KIA">Kia</option>
+                        <option value="FOR">Ford</option>
                     </select>
 
-                    <!-- FILTRO DE AÑO AÑADIDO -->
-                    <select id="filtroAnio" onchange="actualizarSKUDinamico()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
+                    <select id="filtroAnio" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
+                        <option value="">Todos los Años</option>
                         <option value="2026">2026</option>
                         <option value="2025">2025</option>
                         <option value="2024">2024</option>
                         <option value="2023">2023</option>
                     </select>
 
-                    <div class="flex items-center gap-3 bg-gray-800 px-3 py-1 rounded-lg border border-gray-700">
-                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtro4x4" onchange="actualizarSKUDinamico()" class="rounded text-red-600"> 4x4</label>
-                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroHibrido" onchange="actualizarSKUDinamico()" class="rounded text-red-600"> Híbrido</label>
-                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroBlindado" onchange="actualizarSKUDinamico()" class="rounded text-red-600"> Blindado</label>
+                    <div class="flex items-center gap-3 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtro4x4" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> 4x4</label>
+                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroHibrido" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> Híbrido</label>
+                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroBlindado" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> Blindado</label>
                     </div>
+
+                    <button onclick="resetearFiltros()" class="text-xs text-gray-400 hover:text-white underline px-2">Ver Destacados</button>
                 </div>
 
                 <div class="bg-red-950/80 border border-red-500/50 px-3 py-1 rounded-lg">
-                    <span class="text-red-400 font-mono text-xs">SKU Activo:</span>
-                    <span id="skuPreview" class="font-mono font-bold text-white text-xs ml-1">SUV-TOY-2026-4X2-GAS-STD</span>
+                    <span class="text-red-400 font-mono text-xs">SKU Filtro:</span>
+                    <span id="skuPreview" class="font-mono font-bold text-white text-xs ml-1">ALL-ALL-2026-4X2-GAS-STD</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- SECCIÓN 1: HOME -->
+    <!-- SECCIÓN 1: SLIDER PRINCIPAL DINÁMICO (4 FOTOS) -->
     <section id="inicio" class="relative bg-gray-900 text-white h-[500px] overflow-hidden flex items-center">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1600&q=80" class="w-full h-full object-cover opacity-50 filter brightness-90">
-            <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+            <img id="sliderImg" src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1600&q=80" class="w-full h-full object-cover opacity-55 transition-all duration-700">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent"></div>
         </div>
         <div class="max-w-7xl mx-auto px-4 relative z-10 w-full">
             <span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Patio Autorizado</span>
-            <h1 class="text-4xl md:text-6xl font-black mt-3 leading-tight">Encuentra tu próximo vehículo <br><span class="text-red-500">con garantía total</span></h1>
-            <p class="mt-4 text-gray-300 text-lg max-w-xl">Vehículos multimarca, camionetas 4x4, híbridos y unidades con blindaje certificado disponibles para entrega inmediata.</p>
+            <h1 id="sliderTitulo" class="text-4xl md:text-6xl font-black mt-3 leading-tight max-w-3xl">Encuentra tu próximo vehículo con garantía total</h1>
+            <p id="sliderDescripcion" class="mt-4 text-gray-300 text-lg max-w-xl">Vehículos multimarca, camionetas 4x4, híbridos y unidades con blindaje certificado disponibles para entrega inmediata.</p>
             <div class="mt-8 flex gap-4">
-                <a href="#categorias" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver Inventario</a>
-                <a href="#financiamiento" class="bg-white/10 hover:bg-white/20 backdrop-blur text-white font-bold px-6 py-3 rounded-xl transition border border-white/20">Planes de Crédito</a>
+                <a id="sliderLink" href="#categorias" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-lg">Ver Inventario</a>
+                <a href="#financiamiento" class="bg-white/10 hover:bg-white/20 backdrop-blur text-white font-bold px-6 py-3 rounded-xl transition border border-white/20">Promociones</a>
             </div>
+            <div id="sliderDots" class="flex gap-2 mt-8"></div>
         </div>
     </section>
 
-    <!-- SECCIÓN 2: PRODUCTOS DESTACADOS (VITRINA) -->
+    <!-- SECCIÓN 2: CATÁLOGO DE VEHÍCULOS (INVENTARIO Y SKU) -->
     <section id="categorias" class="max-w-7xl mx-auto px-4 py-16">
-        <div class="flex justify-between items-end mb-8">
+        <div class="flex flex-wrap justify-between items-end mb-8 gap-4">
             <div>
-                <span class="text-red-600 font-bold text-sm tracking-widest uppercase">Vitrina Exclusiva</span>
-                <h2 class="text-3xl font-black text-gray-900 mt-1">Vehículos Destacados</h2>
+                <span id="catalogoSubtitulo" class="text-red-600 font-bold text-sm tracking-widest uppercase">Vitrina Exclusiva</span>
+                <h2 id="catalogoTitulo" class="text-3xl font-black text-gray-900 mt-1">Vehículos Destacados</h2>
             </div>
-            <span class="text-sm text-gray-500">Haz clic en Ver Detalle para abrir el selector de variantes</span>
+            <span id="contadorResultados" class="text-sm text-gray-500 font-medium"></span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col justify-between group">
-                <div class="relative overflow-hidden h-56">
-                    <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    <span class="absolute top-3 right-3 bg-black/70 backdrop-blur text-white text-xs font-bold px-2.5 py-1 rounded-lg">4x4 • Híbrido</span>
-                </div>
-                <div class="p-6">
-                    <span class="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-md">SUV / 2.0L</span>
-                    <h3 class="text-xl font-bold mt-2 text-gray-900">Toyota RAV4 Limited</h3>
-                    <p class="text-xs text-gray-400 font-mono mt-1">SKU: SUV-TOY-RAV-2026-4X4-HYB-STD</p>
-                    <div class="mt-6 flex justify-between items-center border-t border-gray-100 pt-4">
-                        <div>
-                            <span class="text-xs text-gray-400 block">Precio Contado</span>
-                            <span class="text-2xl font-black text-gray-900">$38,900</span>
-                        </div>
-                        <button onclick="abrirModalVehiculo('Toyota RAV4 Limited')" class="bg-red-50 text-red-600 hover:bg-red-100 font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-1.5">
-                            Ver Detalle <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
+        <div id="gridVehiculos" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+    </section>
+
+    <!-- SECCIÓN 3: REDES SOCIALES / HISTORIAS DE AUTOS VENDIDOS -->
+    <section id="historias" class="bg-white py-16 border-y border-gray-200">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="mb-8">
+                <span class="text-red-600 font-bold text-sm tracking-widest uppercase">Comunidad JC Motors</span>
+                <h2 class="text-3xl font-black text-gray-900 mt-1">Entregas Recientes & Clientes Satisfechos</h2>
             </div>
+            <div id="gridHistorias" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6"></div>
         </div>
     </section>
 
-    <!-- SECCIÓN 3: FINANCIAMIENTO -->
-    <section id="financiamiento" class="bg-gradient-to-r from-red-600 to-red-800 text-white py-16 my-8">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Convenios Bancarios</span>
-            <h2 class="text-3xl md:text-4xl font-black mt-3">Planes de Financiamiento a tu Medida</h2>
-            <p class="mt-3 text-red-100 max-w-2xl mx-auto text-base">Financia hasta el 80% del valor de tu vehículo con plazos de hasta 60 meses y tasas preferenciales.</p>
-            <div class="mt-8 flex justify-center gap-4">
-                <button class="bg-white text-red-600 hover:bg-gray-100 font-bold px-8 py-3.5 rounded-xl shadow-lg transition">Simular mi Crédito</button>
-            </div>
+    <!-- SECCIÓN 4: PUBLICIDAD (3 BANNERS O VIDEOS) -->
+    <section id="financiamiento" class="max-w-7xl mx-auto px-4 py-16">
+        <div class="mb-8">
+            <span class="text-red-600 font-bold text-sm tracking-widest uppercase">Beneficios & Crédito</span>
+            <h2 class="text-3xl font-black text-gray-900 mt-1">Planes y Campañas Vigentes</h2>
         </div>
+        <div id="gridPublicidad" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
     </section>
 
-    <!-- PIE DE PÁGINA -->
+    <!-- SECCIÓN 5: PIE DE PÁGINA (FOOTER) -->
     <footer class="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -143,18 +132,22 @@
                     <span class="bg-red-600 text-white font-black p-1.5 rounded-lg text-sm">JC</span>
                     <span class="text-xl font-black text-white tracking-tight">MOTORS</span>
                 </div>
-                <p class="text-sm text-gray-400">Patio de vehículos multimarca con altos estándares de calidad, seguridad y respaldo mecánico certificado.</p>
+                <p id="footerDescripcion" class="text-sm text-gray-400">Patio de vehículos multimarca con altos estándares de calidad, seguridad y respaldo mecánico certificado.</p>
             </div>
             <div>
                 <h3 class="text-white text-sm font-bold uppercase tracking-wider mb-4">Contacto Directo</h3>
-                <p class="text-sm mb-2"><i class="fa-solid fa-location-dot text-red-500 mr-2"></i> Av. Principal del Motor, Guayaquil</p>
-                <p class="text-sm mb-2"><i class="fa-solid fa-phone text-red-500 mr-2"></i> +593 99 999 9999</p>
-                <p class="text-sm"><i class="fa-solid fa-envelope text-red-500 mr-2"></i> ventas@jcmotors.ec</p>
+                <p class="text-sm mb-2"><i class="fa-solid fa-location-dot text-red-500 mr-2"></i> <span id="footerDireccion">Av. Principal del Motor, Guayaquil</span></p>
+                <p class="text-sm mb-2"><i class="fa-solid fa-phone text-red-500 mr-2"></i> <span id="footerTelefono">+593 99 999 9999</span></p>
+                <p class="text-sm"><i class="fa-solid fa-envelope text-red-500 mr-2"></i> <span id="footerEmail">ventas@jcmotors.ec</span></p>
             </div>
             <div>
-                <h3 class="text-white text-sm font-bold uppercase tracking-wider mb-4">Gestión</h3>
-                <a href="#admin" class="text-red-400 hover:text-red-300 text-sm block mb-2"><i class="fa-solid fa-lock mr-1"></i> Acceso Panel Administrativo</a>
-                <p class="text-xs text-gray-500 mt-4">Sistema protegido con autenticación JWT, PostgreSQL y Cloudflare R2.</p>
+                <h3 class="text-white text-sm font-bold uppercase tracking-wider mb-4">Redes & Administración</h3>
+                <div class="flex gap-4 mb-4 text-lg">
+                    <a id="footerIg" href="#" target="_blank" class="text-gray-400 hover:text-white"><i class="fa-brands fa-instagram"></i></a>
+                    <a id="footerFb" href="#" target="_blank" class="text-gray-400 hover:text-white"><i class="fa-brands fa-facebook"></i></a>
+                    <a id="footerTk" href="#" target="_blank" class="text-gray-400 hover:text-white"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+                <a href="/admin" class="text-red-400 hover:text-red-300 text-sm inline-block"><i class="fa-solid fa-lock mr-1"></i> Panel Administrativo</a>
             </div>
         </div>
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-600 border-t border-gray-800 mt-10 pt-6">
@@ -162,21 +155,48 @@
         </div>
     </footer>
 
-    <!-- Cargar archivo JavaScript modularizado -->
-    <script src="/static/js/app.js"></script>
-    <script>
-        // Función rápida para reflejar el año en el SKU en tiempo real
-        function actualizarSKUDinamico() {
-            const tipo = document.getElementById('filtroTipo').value;
-            const marca = document.getElementById('filtroMarca').value;
-            const anio = document.getElementById('filtroAnio').value;
-            const traccion = document.getElementById('filtro4x4').checked ? '4X4' : '4X2';
-            const hibrido = document.getElementById('filtroHibrido').checked ? 'HYB' : 'GAS';
-            const blindado = document.getElementById('filtroBlindado').checked ? 'BLI' : 'STD';
+    <!-- MODAL DETALLE VEHÍCULO, GALERÍA R2 Y SELECTOR DE SKU -->
+    <div id="modalVehiculo" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-6 md:p-8 relative shadow-2xl">
+            <button onclick="cerrarModalVehiculo()" class="absolute top-6 right-6 bg-gray-100 hover:bg-gray-200 text-gray-700 w-10 h-10 rounded-full font-bold flex items-center justify-center transition">✕</button>
+            
+            <div class="mb-4">
+                <span id="modalSkuBadge" class="bg-red-50 text-red-600 font-mono text-xs font-bold px-3 py-1 rounded-md"></span>
+                <h2 id="modalTituloVehiculo" class="text-2xl md:text-3xl font-black text-gray-900 mt-2"></h2>
+            </div>
 
-            const skuFinal = `${tipo}-${marca}-${anio}-${traccion}-${hibrido}-${blindado}`;
-            document.getElementById('skuPreview').textContent = skuFinal;
-        }
-    </script>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="bg-black rounded-2xl overflow-hidden h-[340px] relative flex items-center justify-center">
+                        <img id="imgPrincipal" src="" class="w-full h-full object-cover">
+                        <video id="videoPrincipal" controls class="w-full h-full object-cover hidden"></video>
+                    </div>
+                    <div id="modalMiniaturas" class="grid grid-cols-5 gap-2"></div>
+                </div>
+
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2"><i class="fa-solid fa-sliders text-red-600 mr-2"></i> Variantes Disponibles</h3>
+                        <label class="text-xs font-bold text-gray-600 block mb-1">SELECCIONAR VERSIÓN / SKU</label>
+                        <select id="selectVarianteModal" onchange="seleccionarVarianteModal()" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2.5 text-sm font-semibold mb-4"></select>
+                        <div id="detalleVarianteInfo" class="text-xs text-gray-600 space-y-1.5 bg-white p-3 rounded-xl border border-gray-200"></div>
+                    </div>
+
+                    <div class="mt-6">
+                        <div class="mb-4 pt-2 border-t border-gray-200 flex justify-between items-center">
+                            <span class="text-xs text-gray-500 font-bold uppercase">Precio Final</span>
+                            <span id="modalPrecioFinal" class="text-2xl font-black text-red-600"></span>
+                        </div>
+                        <a id="btnCotizarWhatsapp" href="#" target="_blank" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold text-sm transition shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> Cotizar por WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archivo JS modular -->
+    <script src="/static/js/app.js"></script>
 </body>
 </html>
