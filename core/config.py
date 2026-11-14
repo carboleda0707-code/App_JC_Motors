@@ -41,3 +41,7 @@ class Settings:
     R2_PUBLIC_URL: str = get_setting("r2", "public_url", "R2_PUBLIC_URL", "https://pub-cec47eeef2c40129228cbd007ceabee.r2.dev")
 
 settings = Settings()
+
+# --- CHIVATO DE ARRANQUE ---
+# Imprime en los logs exactamente qué URL está cargando (ocultando credenciales si deseas, pero útil para verificar el host)
+print(f"🔍 [CHIVATO CONFIG] DATABASE_URL configurada: {settings.DATABASE_URL[:25]}... (longitud: {len(settings.DATABASE_URL)})")
