@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from core.database import Base, engine
 import models.cms_models  # Registra los modelos para que create_all cree las tablas
 from routers import inventory_router, media_router, public_router, admin_cms_router
+from seed import poblar_categorias_iniciales
 
 Base.metadata.create_all(bind=engine)
 
@@ -25,6 +26,10 @@ app.include_router(public_router.router, prefix="/api", tags=["Web Pública"])
 app.include_router(inventory_router.router, prefix="/api/admin", tags=["Admin Inventario"])
 app.include_router(admin_cms_router.router, prefix="/api/admin/cms", tags=["CMS Admin"])
 app.include_router(media_router.router, prefix="/api/media", tags=["Cloudflare R2"])
+
+@app.on_event("startup")
+def startup_event():
+    poblar_categorias_iniciales()
 
 @app.get("/")
 def home(request: Request):
