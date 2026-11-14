@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JC Motors | Panel Administrativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/diseno.css">
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <!-- BARRA SUPERIOR ADMIN -->
+    <header class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
+        <div class="flex items-center gap-3">
+            <span class="bg-red-600 text-white font-black px-2.5 py-1 rounded text-sm">JC</span>
+            <span class="font-bold tracking-tight text-lg">ADMIN PANEL</span>
+        </div>
+        <a href="/" target="_blank" class="text-xs bg-gray-800 hover:bg-gray-700 px-3.5 py-2 rounded-lg border border-gray-700 transition">
+            <i class="fa-solid fa-arrow-up-right-from-square mr-1.5 text-red-500"></i> Ver Tienda Web
+        </a>
+    </header>
+
+    <!-- NAVEGACIÓN DE LAS 5 SECCIONES -->
+    <div class="max-w-7xl mx-auto px-4 pt-6">
+        <div class="flex flex-wrap gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-200 mb-6">
+            <button onclick="cambiarTab('tab-slider', this)" class="admin-tab active-tab px-4 py-2.5 rounded-lg text-sm font-bold bg-red-600 text-white transition">
+                1. Slider Principal (4 Fotos)
+            </button>
+            <button onclick="cambiarTab('tab-inventario', this)" class="admin-tab px-4 py-2.5 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
+                2. Catálogo, Vehículos & SKU
+            </button>
+            <button onclick="cambiarTab('tab-historias', this)" class="admin-tab px-4 py-2.5 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
+                3. Redes & Vendidos
+            </button>
+            <button onclick="cambiarTab('tab-publicidad', this)" class="admin-tab px-4 py-2.5 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
+                4. Publicidad (3 Banners/Videos)
+            </button>
+            <button onclick="cambiarTab('tab-footer', this)" class="admin-tab px-4 py-2.5 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
+                5. Pie de Página
+            </button>
+        </div>
+
+        <!-- ==============================================================
+             SECCIÓN 1: SLIDER PRINCIPAL (4 SLIDES)
+             ============================================================== -->
+        <section id="tab-slider" class="admin-section bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-black mb-1">1. Administración del Slider Principal</h2>
+            <p class="text-xs text-gray-500 mb-6">Configura las 4 diapositivas de portada, duración en segundos y enlace de disparo.</p>
+
+            <form id="formSlider" onsubmit="guardarSlide(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">NÚMERO DE SLIDE (1 AL 4)</label>
+                    <select id="slideOrden" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="1">Slide #1 (Portada Principal)</option>
+                        <option value="2">Slide #2</option>
+                        <option value="3">Slide #3</option>
+                        <option value="4">Slide #4</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">TIEMPO DE EXPOSICIÓN (SEGUNDOS)</label>
+                    <input type="number" id="slideTiempo" value="5" min="2" max="30" required class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">NOMBRE / TÍTULO DEL BANNER</label>
+                    <input type="text" id="slideNombre" placeholder="Ej: Encuentra tu próximo 4x4" required class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">DISPARO (LINK DESTINO)</label>
+                    <input type="text" id="slideLink" value="#categorias" required class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-xs font-bold text-gray-600 block mb-1">DESCRIPCIÓN CORTA</label>
+                    <input type="text" id="slideDesc" placeholder="Ej: Unidades certificadas con entrega inmediata" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-xs font-bold text-gray-600 block mb-1">IMAGEN (SUBIR A R2 O PEGAR URL)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="slideImgUrl" placeholder="https://pub-....r2.dev/banner1.jpg" required class="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <input type="file" id="fileSlide" accept="image/*" onchange="subirArchivoR2(this, 'slideImgUrl')" class="text-xs bg-white border border-gray-300 rounded-lg p-1.5">
+                    </div>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition">
+                        Guardar Slide
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ==============================================================
+             SECCIÓN 2: CATÁLOGO, CATEGORÍAS, VEHÍCULOS Y SKUs
+             ============================================================== -->
+        <section id="tab-inventario" class="admin-section hidden space-y-6">
+            <!-- Sub-bloque A: Mantenimiento de Categorías -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <h3 class="text-lg font-black mb-3">Mantenimiento de Categorías</h3>
+                <form onsubmit="crearCategoria(event)" class="flex flex-wrap gap-3">
+                    <input type="text" id="catCodigo" placeholder="Código (Ej: SUV)" maxlength="5" required class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase w-36">
+                    <input type="text" id="catNombre" placeholder="Nombre Categoría (Ej: Camioneta 4x4)" required class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1">
+                    <button type="submit" class="bg-gray-900 hover:bg-black text-white font-bold px-5 py-2 rounded-lg text-sm">
+                        + Agregar Categoría
+                    </button>
+                </form>
+                <div id="listaCategorias" class="flex flex-wrap gap-2 mt-4"></div>
+            </div>
+
+            <!-- Sub-bloque B: Ingreso de Vehículo, Galería R2 y Generador de SKU -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <h3 class="text-lg font-black mb-1">Ingreso de Vehículo y Variantes SKU</h3>
+                <p class="text-xs text-gray-500 mb-4">Los vehículos marcados como <b>Destacados</b> aparecen primero en la vitrina principal.</p>
+
+                <form id="formVehiculo" onsubmit="guardarVehiculo(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
+                    <div>
+                        <label class="text-xs font-bold text-gray-600 block mb-1">CATEGORÍA</label>
+                        <select id="vehCategoria" required class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm"></select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-600 block mb-1">MARCA</label>
+                        <input type="text" id="vehMarca" placeholder="Toyota" required oninput="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-600 block mb-1">MODELO</label>
+                        <input type="text" id="vehModelo" placeholder="RAV4 Limited" required oninput="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-600 block mb-1">AÑO</label>
+                        <input type="number" id="vehAnio" value="2026" required oninput="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-gray-600 block mb-1">PRECIO CONTADO ($)</label>
+                        <input type="number" step="0.01" id="vehPrecio" placeholder="38900" required class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-600 block mb-1">COLOR VARIANTE</label>
+                        <input type="text" id="vehColor" value="BLANCO" required oninput="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase">
+                    </div>
+                    <div class="flex items-center gap-4 pt-5">
+                        <label class="text-xs font-bold flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="veh4x4" onchange="autocompletarCodigos()"> 4x4</label>
+                        <label class="text-xs font-bold flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="vehHib" onchange="autocompletarCodigos()"> Híbrido</label>
+                        <label class="text-xs font-bold flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="vehBli" onchange="autocompletarCodigos()"> Blindado</label>
+                    </div>
+                    <div class="flex items-center pt-5">
+                        <label class="text-xs font-bold text-red-600 flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="vehDestacado" checked> Mostrar en Destacados
+                        </label>
+                    </div>
+
+                    <!-- SKU GENERADO AUTOMÁTICAMENTE -->
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold text-gray-600 block mb-1">CÓDIGO SKU GENERADO</label>
+                        <input type="text" id="vehSkuGenerado" readonly class="w-full bg-red-50 border border-red-300 text-red-700 font-mono font-bold rounded-lg px-3 py-2 text-sm">
+                    </div>
+
+                    <!-- GALERÍA MULTIMEDIA R2 -->
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold text-gray-600 block mb-1">GALERÍA FOTOS/VIDEOS (SUBIR A R2)</label>
+                        <input type="file" id="vehGaleriaFiles" multiple accept="image/*,video/*" onchange="subirGaleriaR2(this)" class="w-full text-xs bg-white border border-gray-300 rounded-lg p-1.5">
+                        <input type="hidden" id="vehGaleriaUrls" value="[]">
+                        <span id="galeriaStatus" class="text-xs text-green-600 font-semibold"></span>
+                    </div>
+
+                    <div class="md:col-span-4 text-right">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition">
+                            Registrar Vehículo y SKU
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Tabla de Inventario Actual -->
+                <div class="mt-6 overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-200 text-xs text-gray-500 uppercase">
+                                <th class="py-2">Vehículo</th>
+                                <th class="py-2">Año</th>
+                                <th class="py-2">Precio</th>
+                                <th class="py-2">SKUs Activos</th>
+                                <th class="py-2">Estado Vitrina</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaVehiculosAdmin" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================================================
+             SECCIÓN 3: REDES SOCIALES / HISTORIAS DE AUTOS VENDIDOS
+             ============================================================== -->
+        <section id="tab-historias" class="admin-section hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-black mb-1">3. Historias de Autos Vendidos & Redes Sociales</h2>
+            <p class="text-xs text-gray-500 mb-6">Publica entregas reales de vehículos para generar confianza social.</p>
+
+            <form onsubmit="guardarHistoria(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">TÍTULO DE ENTREGA / CLIENTE</label>
+                    <input type="text" id="histTitulo" placeholder="Ej: Entrega Toyota Hilux 4x4 - Sr. Mendoza" required class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">RED SOCIAL DE ORIGEN</label>
+                    <select id="histRed" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="Instagram">Instagram</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="Facebook">Facebook</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-xs font-bold text-gray-600 block mb-1">COMENTARIO / TESTIMONIO</label>
+                    <input type="text" id="histComentario" placeholder="Excelente atención y entrega inmediata en Guayaquil." class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">FOTO O VIDEO DE ENTREGA (R2)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="histMediaUrl" required placeholder="URL R2" class="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <input type="file" accept="image/*,video/*" onchange="subirArchivoR2(this, 'histMediaUrl')" class="text-xs bg-white border border-gray-300 rounded-lg p-1.5 w-32">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">ENLACE AL POST ORIGINAL (OPCIONAL)</label>
+                    <input type="url" id="histLink" placeholder="https://instagram.com/p/..." class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm">Publicar Historia</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ==============================================================
+             SECCIÓN 4: PUBLICIDAD (3 BANNERS O VIDEOS)
+             ============================================================== -->
+        <section id="tab-publicidad" class="admin-section hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-black mb-1">4. Espacios Publicitarios (3 Banners o Videos)</h2>
+            <p class="text-xs text-gray-500 mb-6">Administra los 3 bloques promocionales de financiamiento, seguros o campañas.</p>
+
+            <form onsubmit="guardarPublicidad(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">ESPACIO PUBLICITARIO</label>
+                    <select id="pubPosicion" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="1">Bloque Publicitario #1</option>
+                        <option value="2">Bloque Publicitario #2</option>
+                        <option value="3">Bloque Publicitario #3</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">TIPO DE MULTIMEDIA</label>
+                    <select id="pubTipo" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="imagen">Banner Imagen</option>
+                        <option value="video">Video Promocional (MP4)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">TÍTULO CAMPAÑA</label>
+                    <input type="text" id="pubTitulo" required placeholder="Ej: Crédito Directo 60 Meses" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">LINK DE ACCIÓN</label>
+                    <input type="text" id="pubLink" value="#financiamiento" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-xs font-bold text-gray-600 block mb-1">ARCHIVO BANNER / VIDEO (R2)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="pubMediaUrl" required placeholder="URL R2" class="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <input type="file" accept="image/*,video/*" onchange="subirArchivoR2(this, 'pubMediaUrl')" class="text-xs bg-white border border-gray-300 rounded-lg p-1.5">
+                    </div>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm">Guardar Publicidad</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ==============================================================
+             SECCIÓN 5: PIE DE PÁGINA (FOOTER)
+             ============================================================== -->
+        <section id="tab-footer" class="admin-section hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-black mb-1">5. Configuración del Pie de Página</h2>
+            <p class="text-xs text-gray-500 mb-6">Actualiza dirección, teléfonos WhatsApp y enlaces oficiales del patio.</p>
+
+            <form onsubmit="guardarFooter(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
+                <div class="md:col-span-2">
+                    <label class="text-xs font-bold text-gray-600 block mb-1">DESCRIPCIÓN DEL PATIO</label>
+                    <input type="text" id="footDesc" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">DIRECCIÓN FÍSICA</label>
+                    <input type="text" id="footDir" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">WHATSAPP / TELÉFONO VENTAS</label>
+                    <input type="text" id="footTel" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">CORREO ELECTRÓNICO</label>
+                    <input type="email" id="footEmail" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">URL INSTAGRAM</label>
+                    <input type="text" id="footIg" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm">Actualizar Pie de Página</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <script src="/static/js/admin.js"></script>
+</body>
+</html>

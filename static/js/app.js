@@ -4,13 +4,14 @@
  */
 
 function actualizarSKUDinamico() {
-    const tipo = document.getElementById('filtroTipo').value || 'SUV';
-    const marca = document.getElementById('filtroMarca').value || 'TOY';
-    const traccion = document.getElementById('filtro4x4').checked ? '4X4' : '4X2';
-    const hibrido = document.getElementById('filtroHibrido').checked ? 'HYB' : 'GAS';
-    const blindado = document.getElementById('filtroBlindado').checked ? 'BLD' : 'STD';
+    const tipo = document.getElementById('filtroTipo')?.value || 'SUV';
+    const marca = document.getElementById('filtroMarca')?.value || 'TOY';
+    const anio = document.getElementById('filtroAnio')?.value || '2026';
+    const traccion = document.getElementById('filtro4x4')?.checked ? '4X4' : '4X2';
+    const hibrido = document.getElementById('filtroHibrido')?.checked ? 'HYB' : 'GAS';
+    const blindado = document.getElementById('filtroBlindado')?.checked ? 'BLI' : 'STD';
 
-    const sku = `${tipo}-${marca}-2000-${traccion}-${hibrido}-${blindado}`;
+    const sku = `${tipo}-${marca}-${anio}-${traccion}-${hibrido}-${blindado}`;
     const previewEl = document.getElementById('skuPreview');
     if (previewEl) {
         previewEl.innerText = sku;

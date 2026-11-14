@@ -6,6 +6,8 @@
     <title>JC Motors | Patio de Vehículos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Hoja de estilos modular externa -->
+    <link rel="stylesheet" href="/static/css/diseno.css">
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans antialiased">
 
@@ -31,7 +33,7 @@
             </div>
         </div>
 
-        <!-- SUBMENÚ DE CATEGORÍAS Y FILTROS FIJO (ACTUALIZACIÓN AUTOMÁTICA DE SKU) -->
+        <!-- SUBMENÚ DE CATEGORÍAS Y FILTROS FIJO CON AÑO -->
         <div class="bg-gray-900 text-white py-2.5 px-4 shadow-inner">
             <div class="max-w-7xl mx-auto flex flex-wrap gap-4 items-center justify-between text-xs md:text-sm">
                 <div class="flex flex-wrap gap-3 items-center">
@@ -47,6 +49,14 @@
                         <option value="KIA">Kia</option>
                     </select>
 
+                    <!-- FILTRO DE AÑO AÑADIDO -->
+                    <select id="filtroAnio" onchange="actualizarSKUDinamico()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+
                     <div class="flex items-center gap-3 bg-gray-800 px-3 py-1 rounded-lg border border-gray-700">
                         <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtro4x4" onchange="actualizarSKUDinamico()" class="rounded text-red-600"> 4x4</label>
                         <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroHibrido" onchange="actualizarSKUDinamico()" class="rounded text-red-600"> Híbrido</label>
@@ -56,13 +66,13 @@
 
                 <div class="bg-red-950/80 border border-red-500/50 px-3 py-1 rounded-lg">
                     <span class="text-red-400 font-mono text-xs">SKU Activo:</span>
-                    <span id="skuPreview" class="font-mono font-bold text-white text-xs ml-1">SUV-TOY-2000-4X2-GAS-STD</span>
+                    <span id="skuPreview" class="font-mono font-bold text-white text-xs ml-1">SUV-TOY-2026-4X2-GAS-STD</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- SECCIÓN 1: HOME - PRESENTACIÓN BANER SLIDER DE 4 FOTOS -->
+    <!-- SECCIÓN 1: HOME -->
     <section id="inicio" class="relative bg-gray-900 text-white h-[500px] overflow-hidden flex items-center">
         <div class="absolute inset-0 z-0">
             <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1600&q=80" class="w-full h-full object-cover opacity-50 filter brightness-90">
@@ -98,7 +108,7 @@
                 <div class="p-6">
                     <span class="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-md">SUV / 2.0L</span>
                     <h3 class="text-xl font-bold mt-2 text-gray-900">Toyota RAV4 Limited</h3>
-                    <p class="text-xs text-gray-400 font-mono mt-1">SKU: SUV-TOY-RAV-2000-4X4-HYB-STD</p>
+                    <p class="text-xs text-gray-400 font-mono mt-1">SKU: SUV-TOY-RAV-2026-4X4-HYB-STD</p>
                     <div class="mt-6 flex justify-between items-center border-t border-gray-100 pt-4">
                         <div>
                             <span class="text-xs text-gray-400 block">Precio Contado</span>
@@ -113,19 +123,19 @@
         </div>
     </section>
 
-    <!-- SECCIÓN 3: PUBLICIDAD / BANNER PROMOCIONAL -->
+    <!-- SECCIÓN 3: FINANCIAMIENTO -->
     <section id="financiamiento" class="bg-gradient-to-r from-red-600 to-red-800 text-white py-16 my-8">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Convenios Bancarios</span>
             <h2 class="text-3xl md:text-4xl font-black mt-3">Planes de Financiamiento a tu Medida</h2>
-            <p class="mt-3 text-red-100 max-w-2xl mx-auto text-base">Financia hasta el 80% del valor de tu vehículo con plazos de hasta 60 meses y tasas preferenciales con Banco Guayaquil, Produbanco y Banco Pichincha.</p>
+            <p class="mt-3 text-red-100 max-w-2xl mx-auto text-base">Financia hasta el 80% del valor de tu vehículo con plazos de hasta 60 meses y tasas preferenciales.</p>
             <div class="mt-8 flex justify-center gap-4">
                 <button class="bg-white text-red-600 hover:bg-gray-100 font-bold px-8 py-3.5 rounded-xl shadow-lg transition">Simular mi Crédito</button>
             </div>
         </div>
     </section>
 
-    <!-- SECCIÓN 4: PIE DE PÁGINA (FOOTER) -->
+    <!-- PIE DE PÁGINA -->
     <footer class="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -152,102 +162,21 @@
         </div>
     </footer>
 
-    <!-- MODAL DINÁMICO DE DETALLE, VARIANTES Y VISOR MULTIMEDIA -->
-    <div id="modalVehiculo" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-6 md:p-8 relative shadow-2xl">
-            <button onclick="cerrarModalVehiculo()" class="absolute top-6 right-6 bg-gray-100 hover:bg-gray-200 text-gray-700 w-10 h-10 rounded-full font-bold flex items-center justify-center transition">✕</button>
-            
-            <div class="flex justify-between items-start mb-4">
-                <div>
-                    <span id="modalSkuBadge" class="bg-red-50 text-red-600 font-mono text-xs font-bold px-3 py-1 rounded-md">SKU: SUV-TOY-RAV-2026-AZUL-HYB</span>
-                    <h2 id="modalTituloVehiculo" class="text-2xl md:text-3xl font-black text-gray-900 mt-2">Toyota RAV4 Limited</h2>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <div class="lg:col-span-2 flex flex-col gap-4">
-                    <div id="visorPrincipalContainer" class="bg-black rounded-2xl overflow-hidden h-[340px] relative shadow-inner flex items-center justify-center">
-                        <img id="imgPrincipal" src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover">
-                        <video id="videoPrincipal" controls class="w-full h-full object-cover hidden"></video>
-                    </div>
-
-                    <div class="grid grid-cols-5 gap-2">
-                        <div onclick="cambiarVisor('imagen', 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80', this)" class="cursor-pointer rounded-xl overflow-hidden h-16 border-2 border-red-600 transition thumbnail-item">
-                            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
-                        </div>
-                        <div onclick="cambiarVisor('imagen', 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80', this)" class="cursor-pointer rounded-xl overflow-hidden h-16 border-2 border-transparent hover:border-red-400 transition thumbnail-item">
-                            <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
-                        </div>
-                        <div onclick="cambiarVisor('imagen', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', this)" class="cursor-pointer rounded-xl overflow-hidden h-16 border-2 border-transparent hover:border-red-400 transition thumbnail-item">
-                            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
-                        </div>
-                        <div onclick="cambiarVisor('imagen', 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80', this)" class="cursor-pointer rounded-xl overflow-hidden h-16 border-2 border-transparent hover:border-red-400 transition thumbnail-item">
-                            <img src="https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
-                        </div>
-                        <div onclick="cambiarVisor('video', 'https://www.w3schools.com/html/mov_bbb.mp4', this)" class="cursor-pointer rounded-xl overflow-hidden h-16 border-2 border-transparent hover:border-red-400 transition bg-black relative flex items-center justify-center thumbnail-item">
-                            <i class="fa-solid fa-play text-white text-sm absolute z-10"></i>
-                            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover opacity-50">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2"><i class="fa-solid fa-sliders text-red-600 mr-2"></i> Variantes del Vehículo</h3>
-                        
-                        <div class="mb-3">
-                            <label class="text-xs font-bold text-gray-600 block mb-1">MARCA</label>
-                            <select id="varMarca" onchange="actualizarSKUModal()" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:border-red-600">
-                                <option value="TOY">Toyota</option>
-                                <option value="CHE">Chevrolet</option>
-                                <option value="KIA">Kia</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="text-xs font-bold text-gray-600 block mb-1">MODELO</label>
-                            <select id="varModelo" onchange="actualizarSKUModal()" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:border-red-600">
-                                <option value="RAV">RAV4 Limited</option>
-                                <option value="COR">Corolla Cross</option>
-                                <option value="HIL">Hilux 4x4</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="text-xs font-bold text-gray-600 block mb-1">AÑO</label>
-                            <select id="varAnio" onchange="actualizarSKUModal()" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:border-red-600">
-                                <option value="2026">2026</option>
-                                <option value="2025">2025</option>
-                                <option value="2024">2024</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="text-xs font-bold text-gray-600 block mb-1">COLOR</label>
-                            <select id="varColor" onchange="actualizarSKUModal()" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:border-red-600">
-                                <option value="AZUL">Azul Metálico</option>
-                                <option value="BLANCO">Blanco Perla</option>
-                                <option value="NEGRO">Negro Eclipse</option>
-                                <option value="GRIS">Gris Plata</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="mb-4 pt-2 border-t border-gray-200 flex justify-between items-center">
-                            <span class="text-xs text-gray-500 font-bold uppercase">Precio Final</span>
-                            <span class="text-2xl font-black text-red-600">$38,900</span>
-                        </div>
-                        <button onclick="alert('Variante seleccionada y cotizada con éxito.')" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold text-sm transition shadow-md">
-                            Reservar Esta Variante
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Cargar archivo JavaScript modularizado -->
     <script src="/static/js/app.js"></script>
+    <script>
+        // Función rápida para reflejar el año en el SKU en tiempo real
+        function actualizarSKUDinamico() {
+            const tipo = document.getElementById('filtroTipo').value;
+            const marca = document.getElementById('filtroMarca').value;
+            const anio = document.getElementById('filtroAnio').value;
+            const traccion = document.getElementById('filtro4x4').checked ? '4X4' : '4X2';
+            const hibrido = document.getElementById('filtroHibrido').checked ? 'HYB' : 'GAS';
+            const blindado = document.getElementById('filtroBlindado').checked ? 'BLI' : 'STD';
+
+            const skuFinal = `${tipo}-${marca}-${anio}-${traccion}-${hibrido}-${blindado}`;
+            document.getElementById('skuPreview').textContent = skuFinal;
+        }
+    </script>
 </body>
 </html>
