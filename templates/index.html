@@ -21,8 +21,8 @@
             <nav class="hidden md:flex space-x-8 font-semibold text-sm text-gray-700">
                 <a href="#inicio" class="hover:text-red-600 transition">Inicio</a>
                 <a href="#categorias" class="hover:text-red-600 transition">Inventario</a>
-                <a href="#nuevos" class="hover:text-red-600 transition">Nuevos</a>
-                <a href="#financiamiento" class="hover:text-red-600 transition">Planes de Financiamiento</a>
+                <a href="#historias" class="hover:text-red-600 transition">Entregas</a>
+                <a href="#financiamiento" class="hover:text-red-600 transition">Promociones</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -32,38 +32,47 @@
             </div>
         </div>
 
-        <!-- SUBMENÚ DE FILTROS SUPERIOR -->
+        <!-- SUBMENÚ DE FILTROS SUPERIOR (TIPO, MODELO, MARCA, AÑO, 4X4, HÍBRIDO, BLINDADO) -->
         <div class="bg-gray-900 text-white py-2.5 px-4 shadow-inner">
-            <div class="max-w-7xl mx-auto flex flex-wrap gap-4 items-center justify-between text-xs md:text-sm">
-                <div class="flex flex-wrap gap-3 items-center">
+            <div class="max-w-7xl mx-auto flex flex-wrap gap-3 items-center justify-between text-xs md:text-sm">
+                <div class="flex flex-wrap gap-2.5 items-center">
+                    <!-- TIPO (Categoría) -->
                     <select id="filtroTipo" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
-                        <option value="ALL">Todas las Categorías</option>
+                        <!-- Dinámico desde BD -->
                     </select>
 
+                    <!-- MODELO -->
+                    <select id="filtroModelo" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
+                        <!-- Dinámico desde BD -->
+                    </select>
+
+                    <!-- MARCA -->
                     <select id="filtroMarca" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
-                        <option value="ALL">Todas las Marcas</option>
-                        <option value="TOY">Toyota</option>
-                        <option value="CHE">Chevrolet</option>
-                        <option value="KIA">Kia</option>
+                        <!-- Dinámico desde BD -->
                     </select>
 
+                    <!-- AÑO -->
                     <select id="filtroAnio" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
                         <option value="">Todos los Años</option>
                         <option value="2026">2026</option>
                         <option value="2025">2025</option>
                         <option value="2024">2024</option>
+                        <option value="2023">2023</option>
                     </select>
 
+                    <!-- CHECKBOXES: 4x4, Híbrido, Blindado -->
                     <div class="flex items-center gap-3 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
                         <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtro4x4" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> 4x4</label>
                         <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroHibrido" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> Híbrido</label>
                         <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroBlindado" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> Blindado</label>
                     </div>
+
+                    <button onclick="resetearFiltros()" class="text-xs text-gray-400 hover:text-white underline px-2">Ver Destacados</button>
                 </div>
 
                 <div class="bg-red-950/80 border border-red-500/50 px-3 py-1 rounded-lg">
-                    <span class="text-red-400 font-mono text-xs">SKU Activo:</span>
-                    <span id="skuPreview" class="font-mono font-bold text-white text-xs ml-1">SUV-TOY-2026-4X2-GAS-STD</span>
+                    <span class="text-red-400 font-mono text-xs">SKU Filtro:</span>
+                    <span id="skuPreview" class="font-mono font-bold text-white text-xs ml-1">SUV-TOY-RAV-2026-4X2-GAS-STD</span>
                 </div>
             </div>
         </div>
@@ -87,7 +96,7 @@
         </div>
     </section>
 
-    <!-- SECCIÓN 2: CATÁLOGO DE VEHÍCULOS (TARJETAS IDÉNTICAS AL DEMO) -->
+    <!-- SECCIÓN 2: CATÁLOGO DE VEHÍCULOS -->
     <section id="categorias" class="max-w-7xl mx-auto px-4 py-16">
         <div class="flex justify-between items-end mb-8">
             <div>
@@ -147,7 +156,7 @@
         </div>
     </footer>
 
-    <!-- MODAL IDÉNTICO AL DEMO (VISOR Y VARIANTES SKU) -->
+    <!-- MODAL DETALLE VEHÍCULO Y VARIANTES SKU -->
     <div id="modalVehiculo" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-6 md:p-8 relative shadow-2xl">
             <button onclick="cerrarModalVehiculo()" class="absolute top-6 right-6 bg-gray-100 hover:bg-gray-200 text-gray-700 w-10 h-10 rounded-full font-bold flex items-center justify-center transition">✕</button>

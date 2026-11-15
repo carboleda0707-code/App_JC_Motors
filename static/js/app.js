@@ -13,42 +13,52 @@ async function inicializarTienda() {
         const res = await fetch('/api/tienda/inicio');
         const data = await res.json();
 
-        // 1. Cargar categorías en el selector de filtros (iniciando con la primera registrada)
+        // 1. Cargar categorías (Tipo) dinámicamente
         const selectCat = document.getElementById('filtroTipo');
         if (selectCat && data.categorias && data.categorias.length > 0) {
-            selectCat.innerHTML = '';
+            selectCat.innerHTML = '<option value="ALL">Todas las Categorías</option>';
             data.categorias.forEach(c => {
                 selectCat.innerHTML += `<option value="${c.codigo}">${c.nombre}</option>`;
             });
         }
 
-        // 2. Cargar marcas dinámicamente desde los destacados (iniciando con la primera registrada)
+        // 2. Cargar Marcas dinámicamente desde los vehículos de la base de datos
         const selectMarca = document.getElementById('filtroMarca');
         if (selectMarca && data.destacados && data.destacados.length > 0) {
             const marcasUnicas = [...new Map(data.destacados.map(v => [v.marca_cod, v.marca])).entries()];
-            selectMarca.innerHTML = '';
+            selectMarca.innerHTML = '<option value="ALL">Todas las Marcas</option>';
             marcasUnicas.forEach(([cod, nombre]) => {
                 selectMarca.innerHTML += `<option value="${cod}">${nombre}</option>`;
             });
         }
 
-        // 3. Renderizar Slider (Sección 1)
+        // 3. Cargar Modelos dinámicamente desde los vehículos de la base de datos
+        const selectModelo = document.getElementById('filtroModelo');
+        if (selectModelo && data.destacados && data.destacados.length > 0) {
+            const modelosUnicos = [...new Set(data.destacados.map(v => v.modelo))];
+            selectModelo.innerHTML = '<option value="ALL">Todos los Modelos</option>';
+            modelosUnicos.forEach(m => {
+                selectModelo.innerHTML += `<option value="${m}">${m}</option>`;
+            });
+        }
+
+        // 4. Renderizar Slider (Sección 1)
         if (data.slider && data.slider.length > 0) {
             slidesData = data.slider;
             iniciarSlider();
         }
 
-        // 4. Renderizar Vehículos Destacados por defecto (Sección 2)
+        // 5. Renderizar Vehículos Destacados por defecto (Sección 2)
         vehiculosActuales = data.destacados || [];
         renderizarVehiculos(vehiculosActuales, true);
 
-        // 5. Renderizar Historias de Autos Vendidos (Sección 3)
+        // 6. Renderizar Historias de Autos Vendidos (Sección 3)
         renderizarHistorias(data.historias || []);
 
-        // 6. Renderizar 3 Espacios Publicitarios (Sección 4)
+        // 7. Renderizar 3 Espacios Publicitarios (Sección 4)
         renderizarPublicidad(data.publicidad || []);
 
-        // 7. Renderizar Pie de Página (Sección 5)
+        // 8. Renderizar Pie de Página (Sección 5)
         if (data.footer) {
             renderizarFooter(data.footer);
         }
@@ -95,6 +105,8 @@ function mostrarSlide(index) {
 function actualizarSKUPreview() {
     const tipo = document.getElementById('filtroTipo')?.value || 'ALL';
     const marca = document.getElementById('filtroMarca')?.value || 'ALL';
+    const modeloSelect = document.getElementById('filtroModelo');
+    const modelo = (modeloSelect && modeloSelect.value !== 'ALL') ? modeloSelect.value.substring(0, 3).toUpperCase() : 'MOD';
     const anio = document.getElementById('filtroAnio')?.value || 'ALL';
     const traccion = document.getElementById('filtro4x4')?.checked ? '4X4' : '4X2';
     const hibrido = document.getElementById('filtroHibrido')?.checked ? 'HYB' : 'GAS';
@@ -102,7 +114,7 @@ function actualizarSKUPreview() {
 
     const previewEl = document.getElementById('skuPreview');
     if (previewEl) {
-        previewEl.innerText = `${tipo}-${marca}-${anio === '' ? 'ALL' : anio}-${traccion}-${hibrido}-${blindado}`;
+        previewEl.innerText = `${tipo}-${marca}-${modelo}-${anio === '' ? 'ALL' : anio}-${traccion}-${hibrido}-${blindado}`;
     }
 }
 
@@ -112,6 +124,7 @@ async function aplicarFiltrosTienda() {
     const params = new URLSearchParams({
         categoria_cod: document.getElementById('filtroTipo')?.value || '',
         marca_cod: document.getElementById('filtroMarca')?.value || '',
+        modelo: document.getElementById('filtroModelo')?.value || '',
         es_4x4: document.getElementById('filtro4x4')?.checked || false,
         es_hibrido: document.getElementById('filtroHibrido')?.checked || false,
         es_blindado: document.getElementById('filtroBlindado')?.checked || false
@@ -135,6 +148,9 @@ async function resetearFiltros() {
 
     const selectMarca = document.getElementById('filtroMarca');
     if (selectMarca && selectMarca.options.length > 0) selectMarca.selectedIndex = 0;
+
+    const selectModelo = document.getElementById('filtroModelo');
+    if (selectModelo && selectModelo.options.length > 0) selectModelo.selectedIndex = 0;
 
     if (document.getElementById('filtroAnio')) document.getElementById('filtroAnio').value = '';
     if (document.getElementById('filtro4x4')) document.getElementById('filtro4x4').checked = false;

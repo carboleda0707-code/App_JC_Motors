@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from core.database import get_db
 from models.cms_models import (
-    SliderItem, CategoriaVehiculo, Vehiculo, VehiculoSKU,
-    HistoriaVendido, PublicidadItem, ConfigFooter
+    SliderItem, CategoriaVehiculo, Vehiculo, VarianteSKU,
+    HistoriaVendida, PublicidadBloque, FooterConfig
 )
 
 router = APIRouter()
@@ -12,26 +12,35 @@ router = APIRouter()
 @router.get("/tienda/inicio")
 def obtener_datos_tienda(db: Session = Depends(get_db)):
     """Carga las 5 secciones dinámicas de la tienda pública."""
-    slides = db.query(SliderItem).filter(SliderItem.activo == True).order_by(SliderItem.orden).all()
+    slides = db.query(SliderItem).order_by(SliderItem.orden).all()
     categorias = db.query(CategoriaVehiculo).all()
     destacados = db.query(Vehiculo).filter(Vehiculo.destacado == True).all()
-    historias = db.query(HistoriaVendido).filter(HistoriaVendido.activo == True).order_by(HistoriaVendido.id.desc()).all()
-    publicidad = db.query(PublicidadItem).filter(PublicidadItem.activo == True).order_by(PublicidadItem.posicion).all()
-    footer = db.query(ConfigFooter).first()
+    historias = db.query(HistoriaVendida).all()
+    publicidad = db.query(PublicidadBloque).all()
+    footer = db.query(FooterConfig).first()
 
     return {
-        "slider": slides,
-        "categorias": categorias,
+        "slider": [{"id": s.id, "orden": s.orden, "tiempo_segundos": s.tiempo_segundos, "nombre": s.nombre, "descripcion": s.descripcion, "imagen_url": s.imagen_url, "link_disparo": s.link_disparo} for s in slides],
+        "categorias": [{"id": c.id, "codigo": c.codigo, "nombre": c.nombre} for c in categorias],
         "destacados": [_serializar_vehiculo(v) for v in destacados],
-        "historias": historias,
-        "publicidad": publicidad,
-        "footer": footer
+        "historias": [{"id": h.id, "cliente_titulo": h.cliente_titulo, "red_social": h.red_social, "comentario": h.comentario, "media_url": h.media_url, "link_post": h.link_post} for h in historias],
+        "publicidad": [{"id": p.id, "posicion": p.posicion, "tipo_media": p.tipo_media, "titulo": p.titulo, "link_destino": p.link_destino, "media_url": p.media_url} for p in publicidad],
+        "footer": {
+            "descripcion_empresa": footer.descripcion_empresa if footer else "",
+            "direccion": footer.direccion if footer else "",
+            "telefono_whatsapp": footer.telefono_whatsapp if footer else "",
+            "email_contacto": footer.email_contacto if footer else "",
+            "url_instagram": footer.url_instagram if footer else "",
+            "url_facebook": footer.url_facebook if footer else "",
+            "url_tiktok": footer.url_tiktok if footer else ""
+        }
     }
 
 @router.get("/tienda/vehiculos")
 def filtrar_vehiculos(
     categoria_cod: Optional[str] = Query(None),
     marca_cod: Optional[str] = Query(None),
+    modelo: Optional[str] = Query(None),
     anio: Optional[int] = Query(None),
     es_4x4: Optional[bool] = Query(False),
     es_hibrido: Optional[bool] = Query(False),
@@ -39,7 +48,7 @@ def filtrar_vehiculos(
     solo_destacados: Optional[bool] = Query(False),
     db: Session = Depends(get_db)
 ):
-    """Filtra vehículos desde la barra superior y devuelve sus SKUs y galerías."""
+    """Filtra vehículos desde la barra superior por Tipo, Modelo, Marca, Año y SKUs."""
     query = db.query(Vehiculo)
 
     if solo_destacados:
@@ -52,6 +61,9 @@ def filtrar_vehiculos(
 
     if marca_cod and marca_cod != "ALL":
         query = query.filter(Vehiculo.marca_cod == marca_cod.upper())
+
+    if modelo and modelo != "ALL":
+        query = query.filter(Vehiculo.modelo == modelo)
 
     if anio:
         query = query.filter(Vehiculo.anio == anio)
@@ -95,7 +107,7 @@ def _serializar_vehiculo(v: Vehiculo, variantes_filtradas=None):
                 "motor": s.motor,
                 "blindaje": s.blindaje,
                 "stock": s.stock,
-                "precio": s.precio_variante or v.precio_contado
+                "precio": s.precio
             }
             for s in vars_list
         ]
