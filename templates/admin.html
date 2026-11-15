@@ -90,23 +90,51 @@
         </section>
 
         <!-- ==============================================================
-             SECCIÓN 2: CATÁLOGO, CATEGORÍAS, VEHÍCULOS Y SKUs
+             SECCIÓN 2: CATÁLOGO, MANTENIMIENTO, VEHÍCULOS Y SKUs
              ============================================================== -->
         <section id="tab-inventario" class="admin-section hidden space-y-6">
-            <!-- Sub-bloque A: Mantenimiento de Categorías -->
+            
+            <!-- Sub-bloque A: Mantenimiento unificado (Creación y Modificación) sin etiquetas -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                <h3 class="text-lg font-black mb-3">Mantenimiento de Categorías</h3>
-                <form onsubmit="crearCategoria(event)" class="flex flex-wrap gap-3">
-                    <input type="text" id="catCodigo" placeholder="Código (Ej: SUV)" maxlength="5" required class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase w-36">
-                    <input type="text" id="catNombre" placeholder="Nombre Categoría (Ej: Camioneta 4x4)" required class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1">
-                    <button type="submit" class="bg-gray-900 hover:bg-black text-white font-bold px-5 py-2 rounded-lg text-sm">
-                        + Agregar Categoría
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+                    <h3 class="text-lg font-black text-gray-900">Mantenimiento (Creación y Modificación)</h3>
+                    
+                    <div class="flex items-center gap-5 bg-gray-50 px-4 py-2 rounded-xl border border-gray-200 text-sm font-bold">
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-800">
+                            <input type="radio" name="tipoMantenimiento" value="categoria" checked onchange="cambiarEntidadMantenimiento(this.value)" class="accent-red-600 w-4 h-4">
+                            Categoría
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-800">
+                            <input type="radio" name="tipoMantenimiento" value="marca" onchange="cambiarEntidadMantenimiento(this.value)" class="accent-red-600 w-4 h-4">
+                            Marca
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-800">
+                            <input type="radio" name="tipoMantenimiento" value="modelo" onchange="cambiarEntidadMantenimiento(this.value)" class="accent-red-600 w-4 h-4">
+                            Modelo
+                        </label>
+                    </div>
+                </div>
+
+                <form id="formMantenimientoUnificado" onsubmit="guardarMantenimiento(event)" class="flex flex-wrap gap-3 items-center">
+                    <select id="mantMarcaPadre" class="hidden bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-red-600 w-52">
+                        <option value="">Seleccione Marca...</option>
+                    </select>
+
+                    <input type="text" id="mantCodigo" placeholder="CÓDIGO (Ej: SUV)" maxlength="5" required class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm uppercase w-40 focus:outline-none focus:border-red-600">
+
+                    <input type="text" id="mantNombre" placeholder="Nombre Categoría (Ej: SUV / Todoterreno)" required class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm flex-1 min-w-[240px] focus:outline-none focus:border-red-600">
+
+                    <select id="mantRegistroExistente" onchange="cargarDatosEdicion()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-600 focus:outline-none focus:border-red-600">
+                        <option value="">-- Nuevo Registro --</option>
+                    </select>
+
+                    <button type="submit" id="btnGuardarMant" class="bg-gray-900 hover:bg-black text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow-sm">
+                        Guardar Categoría
                     </button>
                 </form>
-                <div id="listaCategorias" class="flex flex-wrap gap-2 mt-4"></div>
             </div>
 
-            <!-- Sub-bloque B: Ingreso de Vehículo, Galería R2 (4 Fotos + 1 Video) y Generador de SKU -->
+            <!-- Sub-bloque B: Ingreso de Vehículo y Variantes SKU (Con Select para Categoría, Marca y Modelo) -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <h3 class="text-lg font-black mb-1">Ingreso de Vehículo y Variantes SKU</h3>
                 <p class="text-xs text-gray-500 mb-4">Los vehículos marcados como <b>Destacados</b> aparecen primero en la vitrina principal.</p>
@@ -114,15 +142,19 @@
                 <form id="formVehiculo" onsubmit="guardarVehiculo(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-5 rounded-xl border border-gray-200">
                     <div>
                         <label class="text-xs font-bold text-gray-600 block mb-1">CATEGORÍA</label>
-                        <select id="vehCategoria" required class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm"></select>
+                        <select id="vehCategoria" required onchange="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-red-600"></select>
                     </div>
                     <div>
                         <label class="text-xs font-bold text-gray-600 block mb-1">MARCA</label>
-                        <input type="text" id="vehMarca" placeholder="Toyota" required oninput="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <select id="vehMarca" required onchange="actualizarModelosVehiculo()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-red-600">
+                            <option value="">Seleccione Marca...</option>
+                        </select>
                     </div>
                     <div>
                         <label class="text-xs font-bold text-gray-600 block mb-1">MODELO</label>
-                        <input type="text" id="vehModelo" placeholder="RAV4 Limited" required oninput="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <select id="vehModelo" required onchange="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-red-600">
+                            <option value="">Seleccione Modelo...</option>
+                        </select>
                     </div>
                     <div>
                         <label class="text-xs font-bold text-gray-600 block mb-1">AÑO</label>
@@ -157,16 +189,33 @@
                     <!-- GALERÍA MULTIMEDIA R2 (4 FOTOS + 1 VIDEO) -->
                     <div class="md:col-span-2 bg-white p-4 rounded-xl border border-gray-200">
                         <label class="text-xs font-bold text-gray-700 block mb-1">GALERÍA DEL VEHÍCULO (4 FOTOS + 1 VIDEO)</label>
-                        <p class="text-[11px] text-gray-400 mb-2">Sube 4 imágenes y 1 video MP4 para completar exactamente las 5 miniaturas del modal.</p>
+                        <p class="text-[11px] text-gray-400 mb-3">Sube cada archivo de forma independiente para completar exactamente las 5 miniaturas del modal.</p>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[11px] font-bold text-gray-600 block mb-1">4 FOTOS (GRÁFICOS)</label>
-                                <input type="file" id="vehFotosFiles" multiple accept="image/*" onchange="subirGaleriaFotosR2(this)" class="w-full text-xs bg-gray-50 border border-gray-300 rounded-lg p-1.5">
+                        <div class="space-y-2.5">
+                            <!-- Imagen 1 -->
+                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                <span class="text-xs font-bold text-gray-600 w-24">Imagen 1</span>
+                                <input type="file" id="fileImg1" accept="image/*" onchange="subirFotoIndividualR2(this, 0)" class="text-xs flex-1 bg-white border border-gray-300 rounded-md p-1">
                             </div>
-                            <div>
-                                <label class="text-[11px] font-bold text-gray-600 block mb-1">1 VIDEO PROMOCIONAL (MP4)</label>
-                                <input type="file" id="vehVideoFile" accept="video/mp4,video/webm" onchange="subirVideoR2(this)" class="w-full text-xs bg-gray-50 border border-gray-300 rounded-lg p-1.5">
+                            <!-- Imagen 2 -->
+                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                <span class="text-xs font-bold text-gray-600 w-24">Imagen 2</span>
+                                <input type="file" id="fileImg2" accept="image/*" onchange="subirFotoIndividualR2(this, 1)" class="text-xs flex-1 bg-white border border-gray-300 rounded-md p-1">
+                            </div>
+                            <!-- Imagen 3 -->
+                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                <span class="text-xs font-bold text-gray-600 w-24">Imagen 3</span>
+                                <input type="file" id="fileImg3" accept="image/*" onchange="subirFotoIndividualR2(this, 2)" class="text-xs flex-1 bg-white border border-gray-300 rounded-md p-1">
+                            </div>
+                            <!-- Imagen 4 -->
+                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                <span class="text-xs font-bold text-gray-600 w-24">Imagen 4</span>
+                                <input type="file" id="fileImg4" accept="image/*" onchange="subirFotoIndividualR2(this, 3)" class="text-xs flex-1 bg-white border border-gray-300 rounded-md p-1">
+                            </div>
+                            <!-- Video Promocional -->
+                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                <span class="text-xs font-bold text-red-600 w-24">Video (MP4)</span>
+                                <input type="file" id="fileVideo" accept="video/mp4,video/webm" onchange="subirVideoR2(this)" class="text-xs flex-1 bg-white border border-gray-300 rounded-md p-1">
                             </div>
                         </div>
 
@@ -319,6 +368,120 @@
         </section>
     </div>
 
+    <!-- SCRIPT DE SOPORTE PARA SELECTS EN CASCADA Y MANTENIMIENTO -->
+    <script>
+        let catalogoMarcasModelos = {
+            "Toyota": ["RAV4 Limited", "Hilux SRX 4x4", "Prius Plug-in"],
+            "Kia": ["Sportage GT", "Rio Hatchback", "Carnival VIP"],
+            "Chevrolet": ["Onix Sedán Turbo", "Camaro SS"],
+            "Hyundai": ["Elantra Limited"],
+            "Ford": ["Ranger Raptor", "Transit Van"],
+            "Audi": ["TT Coupé", "A5 Cabriolet", "Q8 e-tron"],
+            "Mazda": ["Mazda 3 Hatchback"],
+            "Honda": ["Odyssey Elite"],
+            "BMW": ["Z4 Roadster", "X5 xDrive50e"],
+            "Tesla": ["Model Y Long Range"],
+            "Nissan": ["Urvan Panel"]
+        };
+
+        let entidadActualMant = 'categoria';
+
+        function inicializarSelectsMarcaModelo() {
+            const marcas = Object.keys(catalogoMarcasModelos).sort();
+            
+            // Poblar Marca en Ingreso de Vehículo
+            const vehMarca = document.getElementById('vehMarca');
+            if (vehMarca) {
+                vehMarca.innerHTML = '<option value="">Seleccione Marca...</option>';
+                marcas.forEach(m => {
+                    vehMarca.innerHTML += `<option value="${m}">${m}</option>`;
+                });
+            }
+
+            // Poblar Marca Padre en Mantenimiento de Modelo
+            const mantMarcaPadre = document.getElementById('mantMarcaPadre');
+            if (mantMarcaPadre) {
+                mantMarcaPadre.innerHTML = '<option value="">Seleccione Marca...</option>';
+                marcas.forEach(m => {
+                    mantMarcaPadre.innerHTML += `<option value="${m}">${m}</option>`;
+                });
+            }
+        }
+
+        function actualizarModelosVehiculo() {
+            const marca = document.getElementById('vehMarca').value;
+            const vehModelo = document.getElementById('vehModelo');
+            vehModelo.innerHTML = '<option value="">Seleccione Modelo...</option>';
+
+            if (marca && catalogoMarcasModelos[marca]) {
+                catalogoMarcasModelos[marca].forEach(mod => {
+                    vehModelo.innerHTML += `<option value="${mod}">${mod}</option>`;
+                });
+            }
+            if (typeof autocompletarCodigos === 'function') {
+                autocompletarCodigos();
+            }
+        }
+
+        function cambiarEntidadMantenimiento(tipo) {
+            entidadActualMant = tipo;
+            const inputCod = document.getElementById('mantCodigo');
+            const inputNom = document.getElementById('mantNombre');
+            const selectPadre = document.getElementById('mantMarcaPadre');
+            const selectExistente = document.getElementById('mantRegistroExistente');
+            const btnGuardar = document.getElementById('btnGuardarMant');
+
+            inputCod.value = '';
+            inputNom.value = '';
+            selectExistente.innerHTML = '<option value="">-- Nuevo Registro --</option>';
+
+            if (tipo === 'categoria') {
+                selectPadre.classList.add('hidden');
+                selectPadre.required = false;
+                inputCod.classList.remove('hidden');
+                inputCod.required = true;
+                inputCod.placeholder = 'CÓDIGO (Ej: SUV)';
+                inputNom.placeholder = 'Nombre Categoría (Ej: SUV / Todoterreno)';
+                btnGuardar.innerText = 'Guardar Categoría';
+            } else if (tipo === 'marca') {
+                selectPadre.classList.add('hidden');
+                selectPadre.required = false;
+                inputCod.classList.remove('hidden');
+                inputCod.required = true;
+                inputCod.placeholder = 'CÓD (Ej: TOY)';
+                inputNom.placeholder = 'Nombre Marca (Ej: Toyota)';
+                btnGuardar.innerText = 'Guardar Marca';
+            } else if (tipo === 'modelo') {
+                selectPadre.classList.remove('hidden');
+                selectPadre.required = true;
+                inputCod.classList.add('hidden');
+                inputCod.required = false;
+                inputNom.placeholder = 'Nombre Modelo (Ej: RAV4 Limited)';
+                btnGuardar.innerText = 'Guardar Modelo';
+            }
+        }
+
+        function cargarDatosEdicion() {
+            const select = document.getElementById('mantRegistroExistente');
+            const opcion = select.options[select.selectedIndex];
+            const btnGuardar = document.getElementById('btnGuardarMant');
+
+            if (!select.value) {
+                document.getElementById('mantCodigo').value = '';
+                document.getElementById('mantNombre').value = '';
+                btnGuardar.innerText = `Guardar ${entidadActualMant.charAt(0).toUpperCase() + entidadActualMant.slice(1)}`;
+                return;
+            }
+
+            document.getElementById('mantCodigo').value = opcion.dataset.codigo || '';
+            document.getElementById('mantNombre').value = opcion.dataset.nombre || '';
+            btnGuardar.innerText = 'Actualizar Registro';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            inicializarSelectsMarcaModelo();
+        });
+    </script>
     <script src="/static/js/admin.js"></script>
 </body>
 </html>

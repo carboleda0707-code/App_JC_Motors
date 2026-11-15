@@ -32,57 +32,59 @@ async function subirArchivoR2(inputFile, targetInputId) {
     }
 }
 
-// --- GESTIÓN GALERÍA VEHÍCULO (4 FOTOS + 1 VIDEO) ---
-let urlsFotosTemp = [];
-let urlVideoTemp = "";
+// --- GESTIÓN GALERÍA VEHÍCULO (4 FOTOS INDIVIDUALES + 1 VIDEO) ---
+let galeriaArrayUrls = ["", "", "", "", ""];
 
-async function subirGaleriaFotosR2(inputFiles) {
-    if (!inputFiles.files.length) return;
-    if (inputFiles.files.length > 4) {
-        alert("Por favor selecciona máximo 4 fotos (gráficos).");
-        return;
-    }
-    
-    urlsFotosTemp = [];
-    document.getElementById('galeriaStatus').innerText = 'Subiendo fotos a R2...';
-
-    for (const file of inputFiles.files) {
-        const formData = new FormData();
-        formData.append('file', file);
-        const res = await fetch('/api/media/upload', { method: 'POST', body: formData });
-        const data = await res.json();
-        if (data.url) urlsFotosTemp.push(data.url);
-    }
-    actualizarGaleriaFinal();
-}
-
-async function subirVideoR2(inputFile) {
-    if (!inputFile.files.length) return;
-    const file = inputFile.files[0];
-    
-    document.getElementById('galeriaStatus').innerText = 'Subiendo video a R2...';
+async function subirFotoIndividualR2(input, indice) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
     const formData = new FormData();
     formData.append('file', file);
-    
+
+    const statusEl = document.getElementById('galeriaStatus');
+    statusEl.innerText = `Subiendo Imagen ${indice + 1}...`;
+
     try {
         const res = await fetch('/api/media/upload', { method: 'POST', body: formData });
         const data = await res.json();
         if (data.url) {
-            urlVideoTemp = data.url;
+            galeriaArrayUrls[indice] = data.url;
+            actualizarGaleriaFinal();
+            statusEl.innerText = `✅ Imagen ${indice + 1} subida correctamente.`;
         }
     } catch (err) {
-        alert('Error subiendo video a R2');
+        console.error("Error subiendo archivo:", err);
+        statusEl.innerText = "Error al subir la imagen.";
     }
-    actualizarGaleriaFinal();
+}
+
+async function subirVideoR2(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const statusEl = document.getElementById('galeriaStatus');
+    statusEl.innerText = "Subiendo video promocional...";
+
+    try {
+        const res = await fetch('/api/media/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.url) {
+            galeriaArrayUrls[4] = data.url;
+            actualizarGaleriaFinal();
+            statusEl.innerText = "✅ Video subido correctamente.";
+        }
+    } catch (err) {
+        console.error("Error subiendo video:", err);
+        statusEl.innerText = "Error al subir el video.";
+    }
 }
 
 function actualizarGaleriaFinal() {
-    const galeriaCompleta = [...urlsFotosTemp];
-    if (urlVideoTemp) {
-        galeriaCompleta.push(urlVideoTemp);
-    }
-    document.getElementById('vehGaleriaUrls').value = JSON.stringify(galeriaCompleta);
-    document.getElementById('galeriaStatus').innerText = `✅ Galería lista: ${urlsFotosTemp.length} foto(s) y ${urlVideoTemp ? '1 video' : '0 videos'} subidos.`;
+    // Filtra las entradas vacías para enviar solo los archivos subidos al array final
+    const filtrados = galeriaArrayUrls.filter(u => u !== "");
+    document.getElementById('vehGaleriaUrls').value = JSON.stringify(filtrados);
 }
 
 // --- SECCIÓN 1: SLIDER ---
@@ -110,13 +112,10 @@ async function cargarCategorias() {
     const res = await fetch('/api/admin/cms/categorias');
     const cats = await res.json();
     const select = document.getElementById('vehCategoria');
-    const lista = document.getElementById('listaCategorias');
 
-    select.innerHTML = '';
-    lista.innerHTML = '';
+    select.innerHTML = '<option value="">Seleccione Categoría...</option>';
     cats.forEach(c => {
         select.innerHTML += `<option value="${c.id}" data-cod="${c.codigo}">${c.nombre} (${c.codigo})</option>`;
-        lista.innerHTML += `<span class="bg-gray-100 border border-gray-300 px-3 py-1 rounded-lg text-xs font-bold">${c.codigo} - ${c.nombre}</span>`;
     });
     autocompletarCodigos();
 }
