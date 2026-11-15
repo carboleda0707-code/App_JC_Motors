@@ -146,22 +146,6 @@ async function cargarCategorias() {
     }
 }
 
-async function crearCategoria(e) {
-    e.preventDefault();
-    const payload = {
-        codigo: document.getElementById('catCodigo').value.toUpperCase(),
-        nombre: document.getElementById('catNombre').value
-    };
-    await fetch('/api/admin/cms/categorias', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-    document.getElementById('catCodigo').value = '';
-    document.getElementById('catNombre').value = '';
-    cargarCategorias();
-}
-
 function autocompletarCodigos() {
     const catSelect = document.getElementById('vehCategoria');
     const catCod = catSelect.options[catSelect.selectedIndex]?.dataset?.cod || 'SUV';
@@ -366,6 +350,7 @@ function cambiarEntidadMantenimiento(tipo) {
         if (selectPadre) {
             selectPadre.classList.remove('hidden');
             selectPadre.required = true;
+            poblarSelectMarcasPadre();
         }
         if (inputCod) {
             inputCod.classList.add('hidden');
@@ -376,6 +361,22 @@ function cambiarEntidadMantenimiento(tipo) {
     }
 
     cargarRegistrosParaMantenimiento(tipo);
+}
+
+async function poblarSelectMarcasPadre() {
+    const selectPadre = document.getElementById('mantMarcaPadre');
+    if (!selectPadre) return;
+    try {
+        const res = await fetch('/api/admin/cms/marcas');
+        if (!res.ok) return;
+        const marcas = await res.json();
+        selectPadre.innerHTML = '<option value="">Seleccione Marca...</option>';
+        marcas.forEach(m => {
+            selectPadre.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+        });
+    } catch (err) {
+        console.error("Error cargando marcas padre:", err);
+    }
 }
 
 async function cargarRegistrosParaMantenimiento(tipo) {
@@ -395,15 +396,15 @@ async function cargarRegistrosParaMantenimiento(tipo) {
 
         data.forEach(item => {
             const opt = document.createElement('option');
-            opt.value = item.id || item.codigo || item.nombre;
-            opt.textContent = tipo === 'modelo' ? `${item.marca || ''} - ${item.nombre}` : `${item.codigo ? item.codigo + ' - ' : ''}${item.nombre}`;
+            opt.value = item.id;
+            opt.textContent = tipo === 'modelo' ? `${item.marca || 'Marca'} - ${item.nombre}` : `${item.codigo ? item.codigo + ' - ' : ''}${item.nombre}`;
             opt.dataset.codigo = item.codigo || '';
             opt.dataset.nombre = item.nombre || '';
             opt.dataset.marcaId = item.marca_id || '';
             selectExistente.appendChild(opt);
         });
     } catch (err) {
-        console.error(`Error cargando registros de ${tipo}:`, err);
+        console.error(`Error filtrando registros de ${tipo}:`, err);
     }
 }
 
