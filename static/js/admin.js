@@ -19,28 +19,12 @@ function cambiarTab(tabId, btn) {
     }
 }
 
-function cambiarTab(tabId, btn) {
-    document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden'));
-    const target = document.getElementById(tabId);
-    if (target) target.classList.remove('hidden');
-
-    document.querySelectorAll('.admin-tab').forEach(b => {
-        b.classList.remove('bg-red-600', 'text-white');
-        b.classList.add('text-gray-600');
-    });
-    
-    if (btn) {
-        btn.classList.add('bg-red-600', 'text-white');
-        btn.classList.remove('text-gray-600');
-        localStorage.setItem('adminActiveTab', tabId);
-    }
-}
-
-// Al cargar el panel, mantener la última pestaña seleccionada
+// Al cargar el panel, mantener la última pestaña seleccionada e inicializar datos
 document.addEventListener('DOMContentLoaded', () => {
     cargarCategorias();
     cargarVehiculosAdmin();
     cargarFooter();
+    cargarRegistrosParaMantenimiento('categoria');
 
     const savedTab = localStorage.getItem('adminActiveTab');
     if (savedTab) {
@@ -119,7 +103,6 @@ async function subirVideoR2(input) {
 }
 
 function actualizarGaleriaFinal() {
-    // Filtra las entradas vacías para enviar solo los archivos subidos al array final
     const filtrados = galeriaArrayUrls.filter(u => u !== "");
     document.getElementById('vehGaleriaUrls').value = JSON.stringify(filtrados);
 }
@@ -198,9 +181,15 @@ async function guardarVehiculo(e) {
     const marca = document.getElementById('vehMarca').value;
     const modelo = document.getElementById('vehModelo').value;
     const skuCodigo = document.getElementById('vehSkuGenerado').value;
+    const categoriaId = document.getElementById('vehCategoria').value;
+
+    if (!categoriaId) {
+        alert("Por favor selecciona una categoría válida.");
+        return;
+    }
 
     const payload = {
-        categoria_id: parseInt(document.getElementById('vehCategoria').value),
+        categoria_id: parseInt(categoriaId),
         marca: marca,
         marca_cod: marca.substring(0, 3).toUpperCase(),
         modelo: modelo,
@@ -219,37 +208,47 @@ async function guardarVehiculo(e) {
         }]
     };
 
-    const res = await fetch('/api/admin/cms/vehiculos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    alert(data.mensaje);
-    cargarVehiculosAdmin();
+    try {
+        const res = await fetch('/api/admin/cms/vehiculos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        alert(data.mensaje || "Vehículo registrado correctamente.");
+        cargarVehiculosAdmin();
+    } catch (err) {
+        console.error("Error al guardar el vehículo:", err);
+        alert("Ocurrió un error al registrar el vehículo.");
+    }
 }
 
 async function cargarVehiculosAdmin() {
-    const res = await fetch('/api/admin/cms/vehiculos');
-    const lista = await res.json();
-    const tbody = document.getElementById('tablaVehiculosAdmin');
-    tbody.innerHTML = '';
+    try {
+        const res = await fetch('/api/admin/cms/vehiculos');
+        const lista = await res.json();
+        const tbody = document.getElementById('tablaVehiculosAdmin');
+        if (!tbody) return;
+        tbody.innerHTML = '';
 
-    lista.forEach(v => {
-        tbody.innerHTML += `
-            <tr>
-                <td class="py-3 font-bold">${v.marca} ${v.modelo}</td>
-                <td class="py-3">${v.anio}</td>
-                <td class="py-3 font-bold text-red-600">$${v.precio_contado.toLocaleString()}</td>
-                <td class="py-3 font-mono text-xs">${v.skus.join(', ')}</td>
-                <td class="py-3">
-                    <button onclick="toggleDestacado(${v.id})" class="px-3 py-1 rounded-full text-xs font-bold ${v.destacado ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}">
-                        ${v.destacado ? '★ Destacado' : 'Normal'}
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
+        lista.forEach(v => {
+            tbody.innerHTML += `
+                <tr>
+                    <td class="py-3 font-bold">${v.marca} ${v.modelo}</td>
+                    <td class="py-3">${v.anio}</td>
+                    <td class="py-3 font-bold text-red-600">$${v.precio_contado.toLocaleString()}</td>
+                    <td class="py-3 font-mono text-xs">${v.skus.join(', ')}</td>
+                    <td class="py-3">
+                        <button onclick="toggleDestacado(${v.id})" class="px-3 py-1 rounded-full text-xs font-bold ${v.destacado ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}">
+                            ${v.destacado ? '★ Destacado' : 'Normal'}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (err) {
+        console.error("Error cargando vehículos administrativos:", err);
+    }
 }
 
 async function toggleDestacado(id) {
@@ -297,13 +296,17 @@ async function guardarPublicidad(e) {
 
 // --- SECCIÓN 5: FOOTER ---
 async function cargarFooter() {
-    const res = await fetch('/api/admin/cms/footer');
-    const data = await res.json();
-    document.getElementById('footDesc').value = data.descripcion_empresa || '';
-    document.getElementById('footDir').value = data.direccion || '';
-    document.getElementById('footTel').value = data.telefono_whatsapp || '';
-    document.getElementById('footEmail').value = data.email_contacto || '';
-    document.getElementById('footIg').value = data.url_instagram || '';
+    try {
+        const res = await fetch('/api/admin/cms/footer');
+        const data = await res.json();
+        document.getElementById('footDesc').value = data.descripcion_empresa || '';
+        document.getElementById('footDir').value = data.direccion || '';
+        document.getElementById('footTel').value = data.telefono_whatsapp || '';
+        document.getElementById('footEmail').value = data.email_contacto || '';
+        document.getElementById('footIg').value = data.url_instagram || '';
+    } catch (err) {
+        console.error("Error cargando footer:", err);
+    }
 }
 
 async function guardarFooter(e) {
@@ -324,12 +327,6 @@ async function guardarFooter(e) {
     alert(data.mensaje);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    cargarCategorias();
-    cargarVehiculosAdmin();
-    cargarFooter();
-});
-
 // --- MANTENIMIENTO DINÁMICO (CATEGORÍA - MARCA - MODELO) ---
 let entidadActualMant = 'categoria';
 
@@ -341,7 +338,6 @@ function cambiarEntidadMantenimiento(tipo) {
     const selectExistente = document.getElementById('mantRegistroExistente');
     const btnGuardar = document.getElementById('btnGuardarMant');
 
-    // Limpiar campos al cambiar de opción
     if (inputCod) {
         inputCod.value = '';
         inputCod.classList.remove('hidden');
@@ -371,7 +367,6 @@ function cambiarEntidadMantenimiento(tipo) {
             selectPadre.classList.remove('hidden');
             selectPadre.required = true;
         }
-        // El modelo no requiere código corto, ocultamos el input de código
         if (inputCod) {
             inputCod.classList.add('hidden');
             inputCod.required = false;
@@ -380,11 +375,9 @@ function cambiarEntidadMantenimiento(tipo) {
         if (btnGuardar) btnGuardar.innerText = 'Guardar Modelo';
     }
 
-    // Cargar los registros reales desde la base de datos para esta entidad
     cargarRegistrosParaMantenimiento(tipo);
 }
 
-// Consulta los registros existentes para rellenar el desplegable de modificación
 async function cargarRegistrosParaMantenimiento(tipo) {
     const selectExistente = document.getElementById('mantRegistroExistente');
     if (!selectExistente) return;
@@ -393,7 +386,7 @@ async function cargarRegistrosParaMantenimiento(tipo) {
 
     try {
         let endpoint = '/api/admin/cms/categorias';
-        if (tipo === 'marca') endpoint = '/api/admin/cms/marcas'; // Asegúrate de tener este endpoint o ajustarlo según tu router
+        if (tipo === 'marca') endpoint = '/api/admin/cms/marcas';
         if (tipo === 'modelo') endpoint = '/api/admin/cms/modelos';
 
         const res = await fetch(endpoint);
@@ -403,7 +396,7 @@ async function cargarRegistrosParaMantenimiento(tipo) {
         data.forEach(item => {
             const opt = document.createElement('option');
             opt.value = item.id || item.codigo || item.nombre;
-            opt.textContent = tipo === 'modelo' ? `${item.marca} - ${item.nombre}` : `${item.codigo ? item.codigo + ' - ' : ''}${item.nombre}`;
+            opt.textContent = tipo === 'modelo' ? `${item.marca || ''} - ${item.nombre}` : `${item.codigo ? item.codigo + ' - ' : ''}${item.nombre}`;
             opt.dataset.codigo = item.codigo || '';
             opt.dataset.nombre = item.nombre || '';
             opt.dataset.marcaId = item.marca_id || '';
@@ -414,25 +407,25 @@ async function cargarRegistrosParaMantenimiento(tipo) {
     }
 }
 
-// Rellena los campos al seleccionar un registro existente, o los limpia si elige "-- Nuevo Registro --"
 function cargarDatosEdicion() {
     const select = document.getElementById('mantRegistroExistente');
     const opcion = select.options[select.selectedIndex];
     const btnGuardar = document.getElementById('btnGuardarMant');
     const inputCod = document.getElementById('mantCodigo');
     const inputNom = document.getElementById('mantNombre');
+    const selectPadre = document.getElementById('mantMarcaPadre');
 
     if (!select.value) {
-        // Limpiar campos para modo Creación de un registro nuevo
         if (inputCod) inputCod.value = '';
         if (inputNom) inputNom.value = '';
+        if (selectPadre) selectPadre.value = '';
         if (btnGuardar) btnGuardar.innerText = `Guardar ${entidadActualMant.charAt(0).toUpperCase() + entidadActualMant.slice(1)}`;
         return;
     }
 
-    // Cargar datos en los inputs para Modificación
     if (inputCod) inputCod.value = opcion.dataset.codigo || '';
     if (inputNom) inputNom.value = opcion.dataset.nombre || '';
+    if (selectPadre && opcion.dataset.marcaId) selectPadre.value = opcion.dataset.marcaId;
     if (btnGuardar) btnGuardar.innerText = `Actualizar ${entidadActualMant.charAt(0).toUpperCase() + entidadActualMant.slice(1)}`;
 }
 
@@ -465,9 +458,9 @@ async function guardarMantenimiento(e) {
         const data = await res.json();
         alert(data.mensaje || "Operación realizada con éxito.");
         
-        // Limpiar formulario y recargar registros
         document.getElementById('formMantenimientoUnificado').reset();
         cambiarEntidadMantenimiento(entidadActualMant);
+        cargarCategorias();
     } catch (err) {
         console.error("Error al guardar mantenimiento:", err);
         alert("Ocurrió un error al procesar la solicitud.");
