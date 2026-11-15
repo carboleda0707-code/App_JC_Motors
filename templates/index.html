@@ -32,48 +32,41 @@
             </div>
         </div>
 
-        <!-- SUBMENÚ DE FILTROS SUPERIOR (TIPO, MODELO, MARCA, AÑO, 4X4, HÍBRIDO, BLINDADO) -->
-        <div class="bg-gray-900 text-white py-2.5 px-4 shadow-inner">
-            <div class="max-w-7xl mx-auto flex flex-wrap gap-3 items-center justify-between text-xs md:text-sm">
-                <div class="flex flex-wrap gap-2.5 items-center">
-                    <!-- TIPO (Categoría) -->
-                    <select id="filtroTipo" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
-                        <!-- Dinámico desde BD -->
-                    </select>
+        <!-- SUBMENÚ DE FILTROS SINCRONIZADOS (SIN RECUADRO ROJO DE SKU) -->
+        <div class="bg-gray-900 text-white py-3 px-4 shadow-inner">
+            <div class="max-w-7xl mx-auto flex flex-wrap gap-3 items-center justify-center md:justify-start text-xs md:text-sm">
+                <!-- TIPO (Categoría) -->
+                <select id="filtroTipo" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500 font-medium">
+                    <option value="ALL">Todas las Categorías</option>
+                </select>
 
-                    <!-- MODELO -->
-                    <select id="filtroModelo" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
-                        <!-- Dinámico desde BD -->
-                    </select>
+                <!-- MARCA -->
+                <select id="filtroMarca" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500 font-medium">
+                    <option value="ALL">Todas las Marcas</option>
+                </select>
 
-                    <!-- MARCA -->
-                    <select id="filtroMarca" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
-                        <!-- Dinámico desde BD -->
-                    </select>
+                <!-- MODELO -->
+                <select id="filtroModelo" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500 font-medium">
+                    <option value="ALL">Todos los Modelos</option>
+                </select>
 
-                    <!-- AÑO -->
-                    <select id="filtroAnio" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500">
-                        <option value="">Todos los Años</option>
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                    </select>
+                <!-- AÑO -->
+                <select id="filtroAnio" onchange="aplicarFiltrosTienda()" class="bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500 font-medium">
+                    <option value="ALL">Todos los Años</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                </select>
 
-                    <!-- CHECKBOXES: 4x4, Híbrido, Blindado -->
-                    <div class="flex items-center gap-3 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
-                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtro4x4" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> 4x4</label>
-                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroHibrido" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> Híbrido</label>
-                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="filtroBlindado" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> Blindado</label>
-                    </div>
-
-                    <button onclick="resetearFiltros()" class="text-xs text-gray-400 hover:text-white underline px-2">Ver Destacados</button>
+                <!-- CHECKBOXES: 4x4, Híbrido, Blindado -->
+                <div class="flex items-center gap-3 bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
+                    <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" id="filtro4x4" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> 4x4</label>
+                    <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" id="filtroHibrido" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> Híbrido</label>
+                    <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" id="filtroBlindado" onchange="aplicarFiltrosTienda()" class="rounded text-red-600"> Blindado</label>
                 </div>
 
-                <div class="bg-red-950/80 border border-red-500/50 px-3 py-1 rounded-lg">
-                    <span class="text-red-400 font-mono text-xs">SKU Filtro:</span>
-                    <span id="skuPreview" class="font-mono font-bold text-white text-xs ml-1">SUV-TOY-RAV-2026-4X2-GAS-STD</span>
-                </div>
+                <button onclick="resetearFiltros()" class="text-xs text-red-400 hover:text-white underline px-2 font-semibold">Ver Todos</button>
             </div>
         </div>
     </header>
@@ -103,7 +96,7 @@
                 <span id="catalogoSubtitulo" class="text-red-600 font-bold text-sm tracking-widest uppercase">Vitrina Exclusiva</span>
                 <h2 id="catalogoTitulo" class="text-3xl font-black text-gray-900 mt-1">Vehículos Destacados</h2>
             </div>
-            <span id="contadorResultados" class="text-sm text-gray-500 font-medium">Haz clic en Ver Detalle para abrir el selector de variantes</span>
+            <span id="contadorResultados" class="text-sm text-gray-500 font-medium">Haz clic en Ver Detalle para abrir el selector de versiones</span>
         </div>
 
         <div id="gridVehiculos" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
@@ -177,7 +170,7 @@
 
                 <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex flex-col justify-between">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2"><i class="fa-solid fa-sliders text-red-600 mr-2"></i> Variantes del Vehículo</h3>
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2"><i class="fa-solid fa-sliders text-red-600 mr-2"></i> Versiones Disponibles</h3>
                         <label class="text-xs font-bold text-gray-600 block mb-1">SELECCIONAR VERSIÓN / SKU</label>
                         <select id="selectVarianteModal" onchange="seleccionarVarianteModal()" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2.5 text-sm font-semibold mb-4 focus:outline-none focus:border-red-600"></select>
                         <div id="detalleVarianteInfo" class="text-xs text-gray-600 space-y-1.5 bg-white p-3 rounded-xl border border-gray-200"></div>
@@ -189,7 +182,7 @@
                             <span id="modalPrecioFinal" class="text-2xl font-black text-red-600"></span>
                         </div>
                         <a id="btnCotizarWhatsapp" href="#" target="_blank" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold text-sm transition shadow-md flex items-center justify-center gap-2">
-                            <i class="fa-brands fa-whatsapp text-lg"></i> Reservar Esta Variante
+                            <i class="fa-brands fa-whatsapp text-lg"></i> Reservar Esta Versión
                         </a>
                     </div>
                 </div>
