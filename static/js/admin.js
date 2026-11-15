@@ -4,15 +4,52 @@
 
 function cambiarTab(tabId, btn) {
     document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden'));
-    document.getElementById(tabId).classList.remove('hidden');
+    const target = document.getElementById(tabId);
+    if (target) target.classList.remove('hidden');
 
     document.querySelectorAll('.admin-tab').forEach(b => {
         b.classList.remove('bg-red-600', 'text-white');
         b.classList.add('text-gray-600');
     });
-    btn.classList.add('bg-red-600', 'text-white');
-    btn.classList.remove('text-gray-600');
+    
+    if (btn) {
+        btn.classList.add('bg-red-600', 'text-white');
+        btn.classList.remove('text-gray-600');
+        localStorage.setItem('adminActiveTab', tabId);
+    }
 }
+
+function cambiarTab(tabId, btn) {
+    document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden'));
+    const target = document.getElementById(tabId);
+    if (target) target.classList.remove('hidden');
+
+    document.querySelectorAll('.admin-tab').forEach(b => {
+        b.classList.remove('bg-red-600', 'text-white');
+        b.classList.add('text-gray-600');
+    });
+    
+    if (btn) {
+        btn.classList.add('bg-red-600', 'text-white');
+        btn.classList.remove('text-gray-600');
+        localStorage.setItem('adminActiveTab', tabId);
+    }
+}
+
+// Al cargar el panel, mantener la última pestaña seleccionada
+document.addEventListener('DOMContentLoaded', () => {
+    cargarCategorias();
+    cargarVehiculosAdmin();
+    cargarFooter();
+
+    const savedTab = localStorage.getItem('adminActiveTab');
+    if (savedTab) {
+        const btnSelector = document.querySelector(`button[onclick*="${savedTab}"]`);
+        if (btnSelector) {
+            cambiarTab(savedTab, btnSelector);
+        }
+    }
+});
 
 // --- SUBIDA DE ARCHIVOS A CLOUDFLARE R2 ---
 async function subirArchivoR2(inputFile, targetInputId) {
@@ -109,15 +146,21 @@ async function guardarSlide(e) {
 
 // --- SECCIÓN 2: CATEGORÍAS, VEHÍCULOS Y SKU ---
 async function cargarCategorias() {
-    const res = await fetch('/api/admin/cms/categorias');
-    const cats = await res.json();
-    const select = document.getElementById('vehCategoria');
+    try {
+        const res = await fetch('/api/admin/cms/categorias');
+        const cats = await res.json();
+        const select = document.getElementById('vehCategoria');
 
-    select.innerHTML = '<option value="">Seleccione Categoría...</option>';
-    cats.forEach(c => {
-        select.innerHTML += `<option value="${c.id}" data-cod="${c.codigo}">${c.nombre} (${c.codigo})</option>`;
-    });
-    autocompletarCodigos();
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Seleccione Categoría...</option>';
+        cats.forEach(c => {
+            select.innerHTML += `<option value="${c.id}" data-cod="${c.codigo}">${c.nombre} (${c.codigo})</option>`;
+        });
+        autocompletarCodigos();
+    } catch (err) {
+        console.error("Error al cargar categorías de la base de datos:", err);
+    }
 }
 
 async function crearCategoria(e) {
@@ -286,3 +329,147 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarVehiculosAdmin();
     cargarFooter();
 });
+
+// --- MANTENIMIENTO DINÁMICO (CATEGORÍA - MARCA - MODELO) ---
+let entidadActualMant = 'categoria';
+
+function cambiarEntidadMantenimiento(tipo) {
+    entidadActualMant = tipo;
+    const inputCod = document.getElementById('mantCodigo');
+    const inputNom = document.getElementById('mantNombre');
+    const selectPadre = document.getElementById('mantMarcaPadre');
+    const selectExistente = document.getElementById('mantRegistroExistente');
+    const btnGuardar = document.getElementById('btnGuardarMant');
+
+    // Limpiar campos al cambiar de opción
+    if (inputCod) {
+        inputCod.value = '';
+        inputCod.classList.remove('hidden');
+        inputCod.required = true;
+    }
+    if (inputNom) inputNom.value = '';
+    if (selectExistente) selectExistente.innerHTML = '<option value="">-- Nuevo Registro --</option>';
+
+    if (tipo === 'categoria') {
+        if (selectPadre) {
+            selectPadre.classList.add('hidden');
+            selectPadre.required = false;
+        }
+        if (inputCod) inputCod.placeholder = 'CÓDIGO (Ej: SUV)';
+        if (inputNom) inputNom.placeholder = 'Nombre Categoría (Ej: SUV / Todoterreno)';
+        if (btnGuardar) btnGuardar.innerText = 'Guardar Categoría';
+    } else if (tipo === 'marca') {
+        if (selectPadre) {
+            selectPadre.classList.add('hidden');
+            selectPadre.required = false;
+        }
+        if (inputCod) inputCod.placeholder = 'CÓD (Ej: TOY)';
+        if (inputNom) inputNom.placeholder = 'Nombre Marca (Ej: Toyota)';
+        if (btnGuardar) btnGuardar.innerText = 'Guardar Marca';
+    } else if (tipo === 'modelo') {
+        if (selectPadre) {
+            selectPadre.classList.remove('hidden');
+            selectPadre.required = true;
+        }
+        // El modelo no requiere código corto, ocultamos el input de código
+        if (inputCod) {
+            inputCod.classList.add('hidden');
+            inputCod.required = false;
+        }
+        if (inputNom) inputNom.placeholder = 'Nombre Modelo (Ej: RAV4 Limited)';
+        if (btnGuardar) btnGuardar.innerText = 'Guardar Modelo';
+    }
+
+    // Cargar los registros reales desde la base de datos para esta entidad
+    cargarRegistrosParaMantenimiento(tipo);
+}
+
+// Consulta los registros existentes para rellenar el desplegable de modificación
+async function cargarRegistrosParaMantenimiento(tipo) {
+    const selectExistente = document.getElementById('mantRegistroExistente');
+    if (!selectExistente) return;
+
+    selectExistente.innerHTML = '<option value="">-- Nuevo Registro --</option>';
+
+    try {
+        let endpoint = '/api/admin/cms/categorias';
+        if (tipo === 'marca') endpoint = '/api/admin/cms/marcas'; // Asegúrate de tener este endpoint o ajustarlo según tu router
+        if (tipo === 'modelo') endpoint = '/api/admin/cms/modelos';
+
+        const res = await fetch(endpoint);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        data.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.id || item.codigo || item.nombre;
+            opt.textContent = tipo === 'modelo' ? `${item.marca} - ${item.nombre}` : `${item.codigo ? item.codigo + ' - ' : ''}${item.nombre}`;
+            opt.dataset.codigo = item.codigo || '';
+            opt.dataset.nombre = item.nombre || '';
+            opt.dataset.marcaId = item.marca_id || '';
+            selectExistente.appendChild(opt);
+        });
+    } catch (err) {
+        console.error(`Error cargando registros de ${tipo}:`, err);
+    }
+}
+
+// Rellena los campos al seleccionar un registro existente, o los limpia si elige "-- Nuevo Registro --"
+function cargarDatosEdicion() {
+    const select = document.getElementById('mantRegistroExistente');
+    const opcion = select.options[select.selectedIndex];
+    const btnGuardar = document.getElementById('btnGuardarMant');
+    const inputCod = document.getElementById('mantCodigo');
+    const inputNom = document.getElementById('mantNombre');
+
+    if (!select.value) {
+        // Limpiar campos para modo Creación de un registro nuevo
+        if (inputCod) inputCod.value = '';
+        if (inputNom) inputNom.value = '';
+        if (btnGuardar) btnGuardar.innerText = `Guardar ${entidadActualMant.charAt(0).toUpperCase() + entidadActualMant.slice(1)}`;
+        return;
+    }
+
+    // Cargar datos en los inputs para Modificación
+    if (inputCod) inputCod.value = opcion.dataset.codigo || '';
+    if (inputNom) inputNom.value = opcion.dataset.nombre || '';
+    if (btnGuardar) btnGuardar.innerText = `Actualizar ${entidadActualMant.charAt(0).toUpperCase() + entidadActualMant.slice(1)}`;
+}
+
+async function guardarMantenimiento(e) {
+    e.preventDefault();
+    const idEdicion = document.getElementById('mantRegistroExistente').value;
+    const codigo = document.getElementById('mantCodigo')?.value.trim().toUpperCase() || '';
+    const nombre = document.getElementById('mantNombre').value.trim();
+    const marcaPadre = document.getElementById('mantMarcaPadre')?.value || '';
+
+    let endpoint = '/api/admin/cms/categorias';
+    if (entidadActualMant === 'marca') endpoint = '/api/admin/cms/marcas';
+    if (entidadActualMant === 'modelo') endpoint = '/api/admin/cms/modelos';
+
+    const payload = {
+        codigo: codigo,
+        nombre: nombre,
+        marca_id: marcaPadre ? parseInt(marcaPadre) : null
+    };
+
+    try {
+        const method = idEdicion ? 'PUT' : 'POST';
+        const url = idEdicion ? `${endpoint}/${idEdicion}` : endpoint;
+
+        const res = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        alert(data.mensaje || "Operación realizada con éxito.");
+        
+        // Limpiar formulario y recargar registros
+        document.getElementById('formMantenimientoUnificado').reset();
+        cambiarEntidadMantenimiento(entidadActualMant);
+    } catch (err) {
+        console.error("Error al guardar mantenimiento:", err);
+        alert("Ocurrió un error al procesar la solicitud.");
+    }
+}
