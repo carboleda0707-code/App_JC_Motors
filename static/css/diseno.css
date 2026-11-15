@@ -195,7 +195,6 @@ body {
         width: 100%;
     }
 
-    /* Asegurar que el selector de año y los checkboxes ocupen filas completas en móvil si es necesario */
     #filtroAnio {
         grid-column: span 2;
     }

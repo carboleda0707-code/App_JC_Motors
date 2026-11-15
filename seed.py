@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from core.database import SessionLocal
-from models.cms_models import CategoriaVehiculo, Vehiculo, VarianteSKU
+from models.cms_models import CategoriaVehiculo, Vehiculo, VehiculoSKU
 
 def poblar_categorias_iniciales():
     db: Session = SessionLocal()
@@ -95,14 +95,14 @@ def poblar_categorias_iniciales():
                 db.refresh(nuevo_v)
 
                 sku_cod = f"{item['cat']}-{item['marca'][:3].upper()}-{item['modelo'][:3].upper()}-{item['anio']}-4X2-GAS-STD-BLAN"
-                nueva_var = VarianteSKU(
+                nueva_var = VehiculoSKU(
                     vehiculo_id=nuevo_v.id,
                     sku_codigo=sku_cod,
                     color="BLANCO METÁLICO",
                     traccion="4X2",
                     motor="GAS",
                     blindaje="STD",
-                    precio=item["precio"],
+                    precio_variante=item["precio"],
                     stock=5
                 )
                 db.add(nueva_var)
