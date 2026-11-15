@@ -108,9 +108,9 @@ def poblar_categorias_iniciales():
                 db.add(nueva_var)
                 db.commit()
 
-        print("✅ Categorías, 10 marcas y 20 modelos inicializados correctamente.")
+        print("✅ Base de datos poblada exitosamente con categorías, marcas, modelos y SKUs.")
     except Exception as e:
-        print(f"❌ Error en seed: {e}")
+        print(f"❌ Error al poblar base de datos: {e}")
         db.rollback()
     finally:
         db.close()
