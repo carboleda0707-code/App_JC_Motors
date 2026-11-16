@@ -14,12 +14,28 @@ class SliderItem(Base):
     tiempo_segundos = Column(Integer, default=5)       # Tiempo de transición en segundos
     activo = Column(Boolean, default=True)
 
-# SECCIÓN 2: CATEGORÍAS, VEHÍCULOS Y VARIANTES SKU
+# SECCIÓN 2: CATEGORÍAS, MARCAS, MODELOS, VEHÍCULOS Y VARIANTES SKU
 class CategoriaVehiculo(Base):
     __tablename__ = "cms_categorias"
     id = Column(Integer, primary_key=True, index=True)
     codigo = Column(String(10), unique=True, nullable=False) # Ej: SUV, SED, PUK
     nombre = Column(String(80), nullable=False)              # Ej: SUV, Sedán, Camioneta
+
+class CmsMarca(Base):
+    __tablename__ = "cms_marcas"
+    id = Column(Integer, primary_key=True, index=True)
+    codigo = Column(String(10), unique=True, index=True, nullable=False) # Ej: TOY, KIA
+    nombre = Column(String(100), unique=True, nullable=False)            # Ej: Toyota, Kia
+
+    modelos = relationship("CmsModelo", back_populates="marca", cascade="all, delete-orphan")
+
+class CmsModelo(Base):
+    __tablename__ = "cms_modelos"
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(100), nullable=False)                       # Ej: RAV4 Limited
+    marca_id = Column(Integer, ForeignKey("cms_marcas.id", ondelete="CASCADE"), nullable=False)
+
+    marca = relationship("CmsMarca", back_populates="modelos")
 
 class Vehiculo(Base):
     __tablename__ = "cms_vehiculos"

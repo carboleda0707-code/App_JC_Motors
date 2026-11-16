@@ -158,11 +158,38 @@ async function cargarMarcasVehiculo() {
 
         select.innerHTML = '<option value="">Seleccione Marca...</option>';
         marcas.forEach(m => {
-            select.innerHTML += `<option value="${m.nombre}">${m.nombre}</option>`;
+            select.innerHTML += `<option value="${m.nombre}" data-id="${m.id}" data-cod="${m.codigo}">${m.nombre}</option>`;
         });
+        
+        // Evento para actualizar modelos cuando cambie la marca seleccionada
+        select.onchange = () => {
+            const marcaId = select.options[select.selectedIndex]?.dataset?.id;
+            cargarModelosPorMarca(marcaId);
+            autocompletarCodigos();
+        };
+
         autocompletarCodigos();
     } catch (err) {
         console.error("Error al cargar marcas:", err);
+    }
+}
+
+async function cargarModelosPorMarca(marcaId) {
+    const selectModelo = document.getElementById('vehModelo');
+    if (!selectModelo) return;
+
+    selectModelo.innerHTML = '<option value="">Seleccione Modelo...</option>';
+    if (!marcaId) return;
+
+    try {
+        const res = await fetch('/api/admin/cms/modelos');
+        const modelos = await res.json();
+        
+        modelos.filter(mod => mod.marca_id == marcaId).forEach(mod => {
+            selectModelo.innerHTML += `<option value="${mod.nombre}">${mod.nombre}</option>`;
+        });
+    } catch (err) {
+        console.error("Error al filtrar modelos por marca:", err);
     }
 }
 
@@ -172,7 +199,7 @@ async function cargarModelosVehiculo() {
         const modelos = await res.json();
         const select = document.getElementById('vehModelo');
 
-        if (!select) return;
+        if (!select || select.options.length > 1) return; // Si ya se gestionó por marca, evitamos pisarlo
 
         select.innerHTML = '<option value="">Seleccione Modelo...</option>';
         modelos.forEach(mod => {
@@ -187,8 +214,13 @@ async function cargarModelosVehiculo() {
 function autocompletarCodigos() {
     const catSelect = document.getElementById('vehCategoria');
     const catCod = catSelect.options[catSelect.selectedIndex]?.dataset?.cod || 'SUV';
-    const marca = (document.getElementById('vehMarca')?.value || 'MAR').substring(0, 3).toUpperCase();
-    const modelo = (document.getElementById('vehModelo')?.value || 'MOD').substring(0, 3).toUpperCase();
+    
+    const marcaSelect = document.getElementById('vehMarca');
+    const marcaCod = marcaSelect.options[marcaSelect.selectedIndex]?.dataset?.cod || (marcaSelect?.value || 'MAR').substring(0, 3).toUpperCase();
+    
+    const modeloVal = document.getElementById('vehModelo')?.value || 'MOD';
+    const modeloCod = modeloVal.substring(0, 3).toUpperCase();
+    
     const anio = document.getElementById('vehAnio')?.value || '2026';
     const color = (document.getElementById('vehColor')?.value || 'STD').substring(0, 4).toUpperCase();
     const traccion = document.getElementById('veh4x4')?.checked ? '4X4' : '4X2';
@@ -197,14 +229,19 @@ function autocompletarCodigos() {
 
     const skuInput = document.getElementById('vehSkuGenerado');
     if (skuInput) {
-        skuInput.value = `${catCod}-${marca}-${modelo}-${anio}-${traccion}-${motor}-${blindaje}-${color}`;
+        skuInput.value = `${catCod}-${marcaCod}-${modeloCod}-${anio}-${traccion}-${motor}-${blindaje}-${color}`;
     }
 }
 
 async function guardarVehiculo(e) {
     e.preventDefault();
     const marca = document.getElementById('vehMarca').value;
+    const marcaSelect = document.getElementById('vehMarca');
+    const marcaCod = marcaSelect.options[marcaSelect.selectedIndex]?.dataset?.cod || marca.substring(0, 3).toUpperCase();
+    
     const modelo = document.getElementById('vehModelo').value;
+    const modeloCod = modelo.substring(0, 3).toUpperCase();
+    
     const skuCodigo = document.getElementById('vehSkuGenerado').value;
     const categoriaId = document.getElementById('vehCategoria').value;
 
@@ -216,9 +253,9 @@ async function guardarVehiculo(e) {
     const payload = {
         categoria_id: parseInt(categoriaId),
         marca: marca,
-        marca_cod: marca.substring(0, 3).toUpperCase(),
+        marca_cod: marcaCod,
         modelo: modelo,
-        modelo_cod: modelo.substring(0, 3).toUpperCase(),
+        modelo_cod: modeloCod,
         anio: parseInt(document.getElementById('vehAnio').value),
         precio_contado: parseFloat(document.getElementById('vehPrecio').value),
         destacado: document.getElementById('vehDestacado').checked,

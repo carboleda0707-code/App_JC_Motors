@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from core.database import get_db
 from models.cms_models import (
-    SliderItem, CategoriaVehiculo, Vehiculo, VehiculoSKU,
+    SliderItem, CategoriaVehiculo, CmsMarca, CmsModelo, Vehiculo, VehiculoSKU,
     HistoriaVendido, PublicidadItem, ConfigFooter
 )
 
@@ -22,6 +22,14 @@ class SliderSchema(BaseModel):
 class CategoriaSchema(BaseModel):
     codigo: str
     nombre: str
+
+class MarcaSchema(BaseModel):
+    codigo: str
+    nombre: str
+
+class ModeloSchema(BaseModel):
+    nombre: str
+    marca_id: int
 
 class SKUSchema(BaseModel):
     sku_codigo: str
@@ -84,7 +92,7 @@ def guardar_slider(item: SliderSchema, db: Session = Depends(get_db)):
     db.commit()
     return {"status": "ok", "mensaje": f"Slide #{item.orden} guardado correctamente"}
 
-# --- ENDPOINTS SECCIÓN 2: CATEGORÍAS, VEHÍCULOS Y SKUs ---
+# --- ENDPOINTS SECCIÓN 2: CATEGORÍAS, MARCAS, MODELOS, VEHÍCULOS Y SKUs ---
 @router.get("/categorias")
 def listar_categorias(db: Session = Depends(get_db)):
     return db.query(CategoriaVehiculo).all()
@@ -95,7 +103,72 @@ def crear_categoria(cat: CategoriaSchema, db: Session = Depends(get_db)):
     db.add(nueva)
     db.commit()
     db.refresh(nueva)
-    return nueva
+    return {"status": "ok", "mensaje": "Categoría creada con éxito", "id": nueva.id}
+
+@router.put("/categorias/{cat_id}")
+def actualizar_categoria(cat_id: int, cat: CategoriaSchema, db: Session = Depends(get_db)):
+    obj = db.query(CategoriaVehiculo).filter(CategoriaVehiculo.id == cat_id).first()
+    if not obj:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    obj.codigo = cat.codigo.upper()
+    obj.nombre = cat.nombre
+    db.commit()
+    return {"status": "ok", "mensaje": "Categoría actualizada correctamente"}
+
+# MARCAS
+@router.get("/marcas")
+def listar_marcas(db: Session = Depends(get_db)):
+    return db.query(CmsMarca).all()
+
+@router.post("/marcas")
+def crear_marca(marca: MarcaSchema, db: Session = Depends(get_db)):
+    nueva = CmsMarca(codigo=marca.codigo.upper(), nombre=marca.nombre)
+    db.add(nueva)
+    db.commit()
+    db.refresh(nueva)
+    return {"status": "ok", "mensaje": "Marca creada con éxito", "id": nueva.id}
+
+@router.put("/marcas/{marca_id}")
+def actualizar_marca(marca_id: int, marca: MarcaSchema, db: Session = Depends(get_db)):
+    obj = db.query(CmsMarca).filter(CmsMarca.id == marca_id).first()
+    if not obj:
+        raise HTTPException(status_code=404, detail="Marca no encontrada")
+    obj.codigo = marca.codigo.upper()
+    obj.nombre = marca.nombre
+    db.commit()
+    return {"status": "ok", "mensaje": "Marca actualizada correctamente"}
+
+# MODELOS
+@router.get("/modelos")
+def listar_modelos(db: Session = Depends(get_db)):
+    modelos = db.query(CmsModelo).all()
+    resultado = []
+    for m in modelos:
+        resultado.append({
+            "id": m.id,
+            "nombre": m.nombre,
+            "marca_id": m.marca_id,
+            "marca": m.marca.nombre if m.marca else ""
+        })
+    return resultado
+
+@router.post("/modelos")
+def crear_modelo(modelo: ModeloSchema, db: Session = Depends(get_db)):
+    nuevo = CmsModelo(nombre=modelo.nombre, marca_id=modelo.marca_id)
+    db.add(nuevo)
+    db.commit()
+    db.refresh(nuevo)
+    return {"status": "ok", "mensaje": "Modelo creado con éxito", "id": nuevo.id}
+
+@router.put("/modelos/{modelo_id}")
+def actualizar_modelo(modelo_id: int, modelo: ModeloSchema, db: Session = Depends(get_db)):
+    obj = db.query(CmsModelo).filter(CmsModelo.id == modelo_id).first()
+    if not obj:
+        raise HTTPException(status_code=404, detail="Modelo no encontrado")
+    obj.nombre = modelo.nombre
+    obj.marca_id = modelo.marca_id
+    db.commit()
+    return {"status": "ok", "mensaje": "Modelo actualizado correctamente"}
 
 @router.get("/vehiculos")
 def listar_vehiculos(db: Session = Depends(get_db)):
