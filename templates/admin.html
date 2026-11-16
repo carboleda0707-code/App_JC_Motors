@@ -134,7 +134,7 @@
                 </form>
             </div>
 
-            <!-- Sub-bloque B: Ingreso de Vehículo y Variantes SKU (Con Select para Categoría, Marca y Modelo) -->
+            <!-- Sub-bloque B: Ingreso de Vehículo y Variantes SKU (Listados libres desde la BD) -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <h3 class="text-lg font-black mb-1">Ingreso de Vehículo y Variantes SKU</h3>
                 <p class="text-xs text-gray-500 mb-4">Los vehículos marcados como <b>Destacados</b> aparecen primero en la vitrina principal.</p>
@@ -146,7 +146,7 @@
                     </div>
                     <div>
                         <label class="text-xs font-bold text-gray-600 block mb-1">MARCA</label>
-                        <select id="vehMarca" required onchange="actualizarModelosVehiculo()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-red-600">
+                        <select id="vehMarca" required onchange="autocompletarCodigos()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-red-600">
                             <option value="">Seleccione Marca...</option>
                         </select>
                     </div>
@@ -368,120 +368,7 @@
         </section>
     </div>
 
-    <!-- SCRIPT DE SOPORTE PARA SELECTS EN CASCADA Y MANTENIMIENTO -->
-    <script>
-        let catalogoMarcasModelos = {
-            "Toyota": ["RAV4 Limited", "Hilux SRX 4x4", "Prius Plug-in"],
-            "Kia": ["Sportage GT", "Rio Hatchback", "Carnival VIP"],
-            "Chevrolet": ["Onix Sedán Turbo", "Camaro SS"],
-            "Hyundai": ["Elantra Limited"],
-            "Ford": ["Ranger Raptor", "Transit Van"],
-            "Audi": ["TT Coupé", "A5 Cabriolet", "Q8 e-tron"],
-            "Mazda": ["Mazda 3 Hatchback"],
-            "Honda": ["Odyssey Elite"],
-            "BMW": ["Z4 Roadster", "X5 xDrive50e"],
-            "Tesla": ["Model Y Long Range"],
-            "Nissan": ["Urvan Panel"]
-        };
-
-        let entidadActualMant = 'categoria';
-
-        function inicializarSelectsMarcaModelo() {
-            const marcas = Object.keys(catalogoMarcasModelos).sort();
-            
-            // Poblar Marca en Ingreso de Vehículo
-            const vehMarca = document.getElementById('vehMarca');
-            if (vehMarca) {
-                vehMarca.innerHTML = '<option value="">Seleccione Marca...</option>';
-                marcas.forEach(m => {
-                    vehMarca.innerHTML += `<option value="${m}">${m}</option>`;
-                });
-            }
-
-            // Poblar Marca Padre en Mantenimiento de Modelo
-            const mantMarcaPadre = document.getElementById('mantMarcaPadre');
-            if (mantMarcaPadre) {
-                mantMarcaPadre.innerHTML = '<option value="">Seleccione Marca...</option>';
-                marcas.forEach(m => {
-                    mantMarcaPadre.innerHTML += `<option value="${m}">${m}</option>`;
-                });
-            }
-        }
-
-        function actualizarModelosVehiculo() {
-            const marca = document.getElementById('vehMarca').value;
-            const vehModelo = document.getElementById('vehModelo');
-            vehModelo.innerHTML = '<option value="">Seleccione Modelo...</option>';
-
-            if (marca && catalogoMarcasModelos[marca]) {
-                catalogoMarcasModelos[marca].forEach(mod => {
-                    vehModelo.innerHTML += `<option value="${mod}">${mod}</option>`;
-                });
-            }
-            if (typeof autocompletarCodigos === 'function') {
-                autocompletarCodigos();
-            }
-        }
-
-        function cambiarEntidadMantenimiento(tipo) {
-            entidadActualMant = tipo;
-            const inputCod = document.getElementById('mantCodigo');
-            const inputNom = document.getElementById('mantNombre');
-            const selectPadre = document.getElementById('mantMarcaPadre');
-            const selectExistente = document.getElementById('mantRegistroExistente');
-            const btnGuardar = document.getElementById('btnGuardarMant');
-
-            inputCod.value = '';
-            inputNom.value = '';
-            selectExistente.innerHTML = '<option value="">-- Nuevo Registro --</option>';
-
-            if (tipo === 'categoria') {
-                selectPadre.classList.add('hidden');
-                selectPadre.required = false;
-                inputCod.classList.remove('hidden');
-                inputCod.required = true;
-                inputCod.placeholder = 'CÓDIGO (Ej: SUV)';
-                inputNom.placeholder = 'Nombre Categoría (Ej: SUV / Todoterreno)';
-                btnGuardar.innerText = 'Guardar Categoría';
-            } else if (tipo === 'marca') {
-                selectPadre.classList.add('hidden');
-                selectPadre.required = false;
-                inputCod.classList.remove('hidden');
-                inputCod.required = true;
-                inputCod.placeholder = 'CÓD (Ej: TOY)';
-                inputNom.placeholder = 'Nombre Marca (Ej: Toyota)';
-                btnGuardar.innerText = 'Guardar Marca';
-            } else if (tipo === 'modelo') {
-                selectPadre.classList.remove('hidden');
-                selectPadre.required = true;
-                inputCod.classList.add('hidden');
-                inputCod.required = false;
-                inputNom.placeholder = 'Nombre Modelo (Ej: RAV4 Limited)';
-                btnGuardar.innerText = 'Guardar Modelo';
-            }
-        }
-
-        function cargarDatosEdicion() {
-            const select = document.getElementById('mantRegistroExistente');
-            const opcion = select.options[select.selectedIndex];
-            const btnGuardar = document.getElementById('btnGuardarMant');
-
-            if (!select.value) {
-                document.getElementById('mantCodigo').value = '';
-                document.getElementById('mantNombre').value = '';
-                btnGuardar.innerText = `Guardar ${entidadActualMant.charAt(0).toUpperCase() + entidadActualMant.slice(1)}`;
-                return;
-            }
-
-            document.getElementById('mantCodigo').value = opcion.dataset.codigo || '';
-            document.getElementById('mantNombre').value = opcion.dataset.nombre || '';
-            btnGuardar.innerText = 'Actualizar Registro';
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            inicializarSelectsMarcaModelo();
-        });
-    </script>
+    <!-- SCRIPT CENTRALIZADO VINCULADO AL CONTROLADOR ADMIN.JS -->
     <script src="/static/js/admin.js"></script>
 </body>
 </html>

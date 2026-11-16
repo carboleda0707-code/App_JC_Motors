@@ -19,9 +19,11 @@ function cambiarTab(tabId, btn) {
     }
 }
 
-// Al cargar el panel, mantener la última pestaña seleccionada e inicializar datos
+// Al cargar el panel, mantener la última pestaña seleccionada e inicializar todos los selectores maestros
 document.addEventListener('DOMContentLoaded', () => {
     cargarCategorias();
+    cargarMarcasVehiculo();
+    cargarModelosVehiculo();
     cargarVehiculosAdmin();
     cargarFooter();
     cargarRegistrosParaMantenimiento('categoria');
@@ -127,7 +129,7 @@ async function guardarSlide(e) {
     alert(data.mensaje);
 }
 
-// --- SECCIÓN 2: CATEGORÍAS, VEHÍCULOS Y SKU ---
+// --- SECCIÓN 2: CATEGORÍAS, MARCAS, MODELOS, VEHÍCULOS Y SKU ---
 async function cargarCategorias() {
     try {
         const res = await fetch('/api/admin/cms/categorias');
@@ -142,22 +144,61 @@ async function cargarCategorias() {
         });
         autocompletarCodigos();
     } catch (err) {
-        console.error("Error al cargar categorías de la base de datos:", err);
+        console.error("Error al cargar categorías:", err);
+    }
+}
+
+async function cargarMarcasVehiculo() {
+    try {
+        const res = await fetch('/api/admin/cms/marcas');
+        const marcas = await res.json();
+        const select = document.getElementById('vehMarca');
+
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Seleccione Marca...</option>';
+        marcas.forEach(m => {
+            select.innerHTML += `<option value="${m.nombre}">${m.nombre}</option>`;
+        });
+        autocompletarCodigos();
+    } catch (err) {
+        console.error("Error al cargar marcas:", err);
+    }
+}
+
+async function cargarModelosVehiculo() {
+    try {
+        const res = await fetch('/api/admin/cms/modelos');
+        const modelos = await res.json();
+        const select = document.getElementById('vehModelo');
+
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Seleccione Modelo...</option>';
+        modelos.forEach(mod => {
+            select.innerHTML += `<option value="${mod.nombre}">${mod.nombre}</option>`;
+        });
+        autocompletarCodigos();
+    } catch (err) {
+        console.error("Error al cargar modelos:", err);
     }
 }
 
 function autocompletarCodigos() {
     const catSelect = document.getElementById('vehCategoria');
     const catCod = catSelect.options[catSelect.selectedIndex]?.dataset?.cod || 'SUV';
-    const marca = (document.getElementById('vehMarca').value || 'MAR').substring(0, 3).toUpperCase();
-    const modelo = (document.getElementById('vehModelo').value || 'MOD').substring(0, 3).toUpperCase();
-    const anio = document.getElementById('vehAnio').value || '2026';
-    const color = (document.getElementById('vehColor').value || 'STD').substring(0, 4).toUpperCase();
-    const traccion = document.getElementById('veh4x4').checked ? '4X4' : '4X2';
-    const motor = document.getElementById('vehHib').checked ? 'HYB' : 'GAS';
-    const blindaje = document.getElementById('vehBli').checked ? 'BLI' : 'STD';
+    const marca = (document.getElementById('vehMarca')?.value || 'MAR').substring(0, 3).toUpperCase();
+    const modelo = (document.getElementById('vehModelo')?.value || 'MOD').substring(0, 3).toUpperCase();
+    const anio = document.getElementById('vehAnio')?.value || '2026';
+    const color = (document.getElementById('vehColor')?.value || 'STD').substring(0, 4).toUpperCase();
+    const traccion = document.getElementById('veh4x4')?.checked ? '4X4' : '4X2';
+    const motor = document.getElementById('vehHib')?.checked ? 'HYB' : 'GAS';
+    const blindaje = document.getElementById('vehBli')?.checked ? 'BLI' : 'STD';
 
-    document.getElementById('vehSkuGenerado').value = `${catCod}-${marca}-${modelo}-${anio}-${traccion}-${motor}-${blindaje}-${color}`;
+    const skuInput = document.getElementById('vehSkuGenerado');
+    if (skuInput) {
+        skuInput.value = `${catCod}-${marca}-${modelo}-${anio}-${traccion}-${motor}-${blindaje}-${color}`;
+    }
 }
 
 async function guardarVehiculo(e) {
@@ -462,6 +503,8 @@ async function guardarMantenimiento(e) {
         document.getElementById('formMantenimientoUnificado').reset();
         cambiarEntidadMantenimiento(entidadActualMant);
         cargarCategorias();
+        cargarMarcasVehiculo();
+        cargarModelosVehiculo();
     } catch (err) {
         console.error("Error al guardar mantenimiento:", err);
         alert("Ocurrió un error al procesar la solicitud.");
